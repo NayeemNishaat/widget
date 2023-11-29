@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/nayeemnishaat/go-web-app/controller"
 	"github.com/nayeemnishaat/go-web-app/lib"
 	"github.com/nayeemnishaat/go-web-app/router"
 )
@@ -21,7 +22,6 @@ func main() {
 
 	flag.Parse()
 
-	app.RootRouter = router.RootRouter()
 	app.Stripe.Key = os.Getenv("STRIPE_KEY")
 	app.Stripe.Secret = os.Getenv("STRIPE_SECRET")
 
@@ -31,6 +31,9 @@ func main() {
 	app.Version = VERSION
 
 	lib.InitApp(&app)
+	controller.InitApp(&app)
+
+	app.RootRouter = router.RootRouter()
 
 	err := lib.App.Serve()
 	if err != nil {

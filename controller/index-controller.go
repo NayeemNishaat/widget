@@ -6,7 +6,7 @@ type Application struct {
 	*lib.Application
 }
 
-var App = &Application{lib.App}
+var App *Application
 
 func InitApp(app *lib.Application) {
 	App = &Application{app}
