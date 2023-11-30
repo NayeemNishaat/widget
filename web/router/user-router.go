@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/nayeemnishaat/go-web-app/controller"
+	"github.com/nayeemnishaat/go-web-app/web/controller"
 )
 
 func UserRouter() http.Handler {
