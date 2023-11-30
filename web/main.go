@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/nayeemnishaat/go-web-app/types"
+	"github.com/nayeemnishaat/go-web-app/lib"
 	"github.com/nayeemnishaat/go-web-app/web/controller"
 	"github.com/nayeemnishaat/go-web-app/web/router"
 )
@@ -18,7 +18,7 @@ const VERSION = "1.0.0"
 const CSS_VERSION = "1"
 
 func main() {
-	var app types.Application
+	var app lib.Application
 	flag.IntVar(&app.Port, "port", 3000, "Server Port")
 	flag.StringVar(&app.Env, "env", "dev", "App Env {dev|prod}")
 	flag.StringVar(&app.API, "api", "http://localhost:4000", "API URL")
@@ -43,7 +43,7 @@ func main() {
 	}
 }
 
-func Serve(app *types.Application) error {
+func Serve(app *lib.Application) error {
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", app.Port),
 		Handler:           app.RootRouter,
