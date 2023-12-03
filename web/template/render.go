@@ -1,4 +1,4 @@
-package lib
+package template
 
 import (
 	"embed"
@@ -6,6 +6,8 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/nayeemnishaat/go-web-app/lib"
 )
 
 type templateData struct {
@@ -22,15 +24,26 @@ type templateData struct {
 	CSSVersion      string
 }
 
+type Application struct {
+	*lib.Application
+}
+
+var App *Application
+
+func InitApp(app *lib.Application) *Application {
+	return &Application{app}
+}
+
 var functions = template.FuncMap{}
 
+//go:embed *
 var templateFS embed.FS
 
 func (app *Application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	return td
 }
 
-func (app *Application) renderTemplate(w http.ResponseWriter, r *http.Request, page string, td *templateData, partials ...string) error {
+func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, page string, td *templateData, partials ...string) error {
 	var t *template.Template
 	var err error
 

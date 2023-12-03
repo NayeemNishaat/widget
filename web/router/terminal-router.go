@@ -10,7 +10,7 @@ import (
 func UserRouter() http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Get("/user", controller.App.User)
+	mux.Get("/terminal", controller.App.TerminalPage)
 
 	return mux
 }

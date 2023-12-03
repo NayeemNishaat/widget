@@ -12,6 +12,7 @@ import (
 	"github.com/nayeemnishaat/go-web-app/lib"
 	"github.com/nayeemnishaat/go-web-app/web/controller"
 	"github.com/nayeemnishaat/go-web-app/web/router"
+	tmpl "github.com/nayeemnishaat/go-web-app/web/template"
 )
 
 const VERSION = "1.0.0"
@@ -33,7 +34,8 @@ func main() {
 	app.TemplateCache = make(map[string]*template.Template)
 	app.Version = VERSION
 
-	controller.InitApp(&app)
+	tApp := tmpl.InitApp(&app)
+	controller.InitApp(tApp)
 
 	app.RootRouter = router.RootRouter()
 

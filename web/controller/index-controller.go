@@ -1,13 +1,15 @@
 package controller
 
-import "github.com/nayeemnishaat/go-web-app/lib"
+import (
+	"github.com/nayeemnishaat/go-web-app/web/template"
+)
 
 type Application struct {
-	*lib.Application
+	*template.Application
 }
 
 var App *Application
 
-func InitApp(app *lib.Application) {
+func InitApp(app *template.Application) {
 	App = &Application{app}
 }
