@@ -6,7 +6,7 @@ type StripePayload struct {
 }
 
 type Response struct {
-	Error   bool           `json:"error"`
-	Message string         `json:"message"`
-	Data    map[string]any `json:"data"`
+	Error   bool           `json:"error,omitempty"`
+	Message string         `json:"message,omitempty"`
+	Data    map[string]any `json:"data,omitempty"`
 }

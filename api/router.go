@@ -16,7 +16,7 @@ func Router() http.Handler {
 		MaxAge:           300,
 	}))
 
-	mux.Get("/api/v1/payment-intent", app.getPaymentIntent)
+	mux.Post("/api/v1/payment-intent", app.getPaymentIntent)
 
 	return mux
 }
