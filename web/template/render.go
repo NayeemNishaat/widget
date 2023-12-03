@@ -47,7 +47,7 @@ func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, p
 	var t *template.Template
 	var err error
 
-	templateToRender := fmt.Sprintf("template/%s.page.tmpl", page)
+	templateToRender := fmt.Sprintf("%s.page.tmpl", page)
 
 	_, templateInMap := app.TemplateCache[templateToRender]
 
@@ -84,14 +84,14 @@ func (app *Application) parseTemplate(partials []string, page string, templateTo
 
 	if len(partials) > 0 {
 		for i, x := range partials {
-			partials[i] = fmt.Sprintf("template/%s.partial.tmpl", x)
+			partials[i] = fmt.Sprintf("%s.partial.tmpl", x)
 		}
 	}
 
 	if len(partials) > 0 {
-		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "template/base.layout.tmpl", strings.Join(partials, ","), templateToRender)
+		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "base.layout.tmpl", strings.Join(partials, ","), templateToRender)
 	} else {
-		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "template/base.layout.tmpl", templateToRender)
+		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "base.layout.tmpl", templateToRender)
 	}
 
 	if err != nil {
