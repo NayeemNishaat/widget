@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nayeemnishaat/go-web-app/lib"
+	"github.com/nayeemnishaat/go-web-app/web/lib"
 )
 
 type templateData struct {
