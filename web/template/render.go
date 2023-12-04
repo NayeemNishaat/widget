@@ -10,11 +10,11 @@ import (
 	"github.com/nayeemnishaat/go-web-app/web/lib"
 )
 
-type templateData struct {
+type TemplateData struct {
 	StringMap       map[string]string
 	IntMap          map[string]int
 	FloatMap        map[string]float32
-	Data            map[string]interface{}
+	Data            map[string]any
 	CSRF            string
 	Warning         string
 	Info            string
@@ -39,11 +39,12 @@ var functions = template.FuncMap{}
 //go:embed *
 var templateFS embed.FS
 
-func (app *Application) addDefaultData(td *templateData, r *http.Request) *templateData {
+func (app *Application) addDefaultData(td *TemplateData, r *http.Request) *TemplateData {
+	td.API = app.API
 	return td
 }
 
-func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, page string, td *templateData, partials ...string) error {
+func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, page string, td *TemplateData, partials ...string) error {
 	var t *template.Template
 	var err error
 
@@ -63,7 +64,7 @@ func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, p
 	}
 
 	if td == nil {
-		td = &templateData{}
+		td = &TemplateData{}
 	}
 
 	td = app.addDefaultData(td, r)

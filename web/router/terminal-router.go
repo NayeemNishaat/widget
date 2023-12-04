@@ -11,6 +11,7 @@ func UserRouter() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Get("/terminal", controller.App.TerminalPage)
+	mux.Post("/payment-succeeded", controller.App.PaymentSucceeded)
 
 	return mux
 }
