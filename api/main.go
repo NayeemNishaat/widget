@@ -5,10 +5,14 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/nayeemnishaat/go-web-app/api/lib"
 )
 
 func main() {
 	initApp()
+	db := lib.InitDB()
+	defer db.Close()
 
 	err := serve(&app)
 	if err != nil {

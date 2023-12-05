@@ -34,6 +34,9 @@ func main() {
 	app.TemplateCache = make(map[string]*template.Template)
 	app.Version = VERSION
 
+	db := lib.InitDB()
+	defer db.Close()
+
 	tApp := tmpl.InitApp(&app)
 	controller.InitApp(tApp)
 
