@@ -7,11 +7,10 @@ import (
 	"github.com/nayeemnishaat/go-web-app/web/controller"
 )
 
-func TerminalRouter() http.Handler {
+func EcomRouter() http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Get("/", controller.App.TerminalPage)
-	mux.Post("/payment-succeeded", controller.App.PaymentSucceeded)
+	mux.Get("/charge-once", controller.App.ChargeOncePage)
 
 	return mux
 }

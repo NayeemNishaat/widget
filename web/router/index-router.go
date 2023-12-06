@@ -9,7 +9,11 @@ import (
 func RootRouter() http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Mount("/", UserRouter())
+	mux.Mount("/terminal", TerminalRouter())
+	mux.Mount("/ecom", EcomRouter())
+
+	fileServer := http.FileServer(http.Dir("./public"))
+	mux.Handle("/public/*", http.StripPrefix("/public", fileServer))
 
 	return mux
 }

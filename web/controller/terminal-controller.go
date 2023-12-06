@@ -7,7 +7,7 @@ import (
 )
 
 func (app *Application) TerminalPage(w http.ResponseWriter, r *http.Request) {
-	if err := app.RenderTemplate(w, r, "terminal", &template.TemplateData{StringMap: map[string]string{"publishable_key": app.Stripe.Key}}); err != nil {
+	if err := app.RenderTemplate(w, r, "terminal", &template.TemplateData{StringMap: map[string]string{"publishable_key": app.Stripe.Key}}, "stripe-js"); err != nil {
 		app.ErrorLog.Println(err)
 	}
 }
