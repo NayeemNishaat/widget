@@ -5,17 +5,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/nayeemnishaat/go-web-app/api/model"
 )
 
 type config struct {
 	Port       int
 	Env        string
 	RootRouter http.Handler
-	DB         struct{ DSN string }
 	Stripe     struct {
 		Secret string
 		Key    string
 	}
+	DB *model.SqlDB
 }
 
 type application struct {

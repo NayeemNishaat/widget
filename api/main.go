@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"github.com/nayeemnishaat/go-web-app/api/lib"
+	"github.com/nayeemnishaat/go-web-app/api/model"
 )
 
 func main() {
 	initApp()
 	db := lib.InitDB()
 	defer db.Close()
+	app.DB = &model.SqlDB{Pool: db}
 
 	err := serve(&app)
 	if err != nil {

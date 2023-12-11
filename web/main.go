@@ -36,6 +36,7 @@ func main() {
 
 	db := lib.InitDB()
 	defer db.Close()
+	app.DB = db
 
 	tApp := tmpl.InitApp(&app)
 	controller.InitApp(tApp)

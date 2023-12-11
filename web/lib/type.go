@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Config struct {
@@ -11,11 +13,11 @@ type Config struct {
 	Env        string
 	API        string
 	RootRouter http.Handler
-	DB         struct{ DSN string }
 	Stripe     struct {
 		Secret string
 		Key    string
 	}
+	DB *pgxpool.Pool
 }
 
 type Application struct {
