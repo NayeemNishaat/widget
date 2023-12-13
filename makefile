@@ -8,6 +8,21 @@ run:
 test:
 	go test -v ./... -count=1
 
+migration_create:
+	/Users/labyrinth/.go/bin/migrate create -ext sql -dir ./api/migration -seq mg
+
+migration_up:
+	/Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" -verbose up ${v}
+
+migration_down:
+	/Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" -verbose down ${v}
+
+migration_fix:
+	/Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" force $(v)
+# make migration_fix v=1
+# v?=v_default # Assign default value if not provided
+
+
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
 # STRIPE_KEY=pk_test_lOwqX0SiQCGm7wSkqNoBgMLc
 # GOSTRIPE_PORT=4000
