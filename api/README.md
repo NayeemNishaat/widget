@@ -47,3 +47,4 @@ Default build location will be in the current dir
 
 - GOOS=darwin go build
 - GOOS=darwin go build main.go
+- go build -tags="mysql sqlite3 postgres mongodb"
