@@ -33,3 +33,17 @@
 - Download the source
 - Go to the main file dir and run `go install .` or `go install -tags 'pgx5' .`
 - The binary file will be available inside go path.
+
+# Build
+
+Default build location will be in the current dir
+
+## Windows
+
+- GOOS=windows go build
+- GOOS=windows go build main.go
+
+## Mac
+
+- GOOS=darwin go build
+- GOOS=darwin go build main.go
