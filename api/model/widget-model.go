@@ -32,14 +32,20 @@ func (m *SqlDB) GetWidget(id int) (Widget, error) {
 
 	row := m.QueryRow(ctx, `
 		select 
-			id, name
+			id, name, description, inventory_level, price, image, created_at, updated_at
 		from 
-			widget
+			widgets
 		where id = $1`, id)
 
 	err := row.Scan(
 		&widget.ID,
 		&widget.Name,
+		&widget.Description,
+		&widget.InventoryLevel,
+		&widget.Price,
+		&widget.Image,
+		&widget.CreatedAt,
+		&widget.UpdatedAt,
 	)
 
 	if err != nil {

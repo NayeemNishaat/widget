@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/nayeemnishaat/go-web-app/api/model"
 	"github.com/nayeemnishaat/go-web-app/web/controller"
 	"github.com/nayeemnishaat/go-web-app/web/lib"
 	"github.com/nayeemnishaat/go-web-app/web/router"
@@ -36,7 +37,7 @@ func main() {
 
 	db := lib.InitDB()
 	defer db.Close()
-	app.DB = db
+	app.DB = &model.SqlDB{Pool: db}
 
 	tApp := tmpl.InitApp(&app)
 	controller.InitApp(tApp)

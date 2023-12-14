@@ -10,7 +10,7 @@ import (
 func EcomRouter() http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Get("/charge-once", controller.App.ChargeOncePage)
+	mux.Get("/widget/{id}", controller.App.ChargeOncePage)
 
 	return mux
 }

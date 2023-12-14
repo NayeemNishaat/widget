@@ -23,6 +23,12 @@ migration_fix:
 # make migration_fix v=1
 # v?=v_default # Assign default value if not provided
 
+air_be:
+	cd ./api && /Users/labyrinth/.go/bin/air
+
+air_fe:
+	cd ./web && /Users/labyrinth/.go/bin/air
+
 
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
 # STRIPE_KEY=pk_test_lOwqX0SiQCGm7wSkqNoBgMLc
