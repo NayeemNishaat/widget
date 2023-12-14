@@ -30,6 +30,8 @@
 
 **Run `make migration_up`, `make migration_down`, `make migration_fix`**
 
+`make migration_fix v=2` # v should be any last successful migration version (current -1 is preffered).
+
 # Install Go Software
 
 - Download the source

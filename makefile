@@ -8,8 +8,9 @@ run:
 test:
 	go test -v ./... -count=1
 
+seq?=mg
 migration_create:
-	/Users/labyrinth/.go/bin/migrate create -ext sql -dir ./api/migration -seq mg
+	/Users/labyrinth/.go/bin/migrate create -ext sql -dir ./api/migration -seq ${seq}
 
 migration_up:
 	/Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" -verbose up ${v}
