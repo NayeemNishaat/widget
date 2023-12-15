@@ -30,7 +30,16 @@ air_fe:
 	cd ./web && /Users/labyrinth/.go/bin/air
 
 start_db:
-	/opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
+	/opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16 &
+# Run inbackground (&)
+
+stop_db:
+	@-pkill -SIGTERM -f "postgres"
+# lsof -i :3000
+# lsof -ti :3000
+# fuser 3000/tcp
+# fuser 3000/udp
+
 
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
 # STRIPE_KEY=pk_test_lOwqX0SiQCGm7wSkqNoBgMLc
