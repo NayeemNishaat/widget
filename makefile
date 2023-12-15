@@ -29,6 +29,8 @@ air_be:
 air_fe:
 	cd ./web && /Users/labyrinth/.go/bin/air
 
+start_db:
+	/opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
 
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
 # STRIPE_KEY=pk_test_lOwqX0SiQCGm7wSkqNoBgMLc
