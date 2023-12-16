@@ -5,8 +5,11 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 )
+
+var Session *scs.SessionManager
 
 type Config struct {
 	Port       int
@@ -17,7 +20,8 @@ type Config struct {
 		Secret string
 		Key    string
 	}
-	DB *model.SqlDB
+	DB      *model.SqlDB
+	Session scs.SessionManager
 }
 
 type Application struct {

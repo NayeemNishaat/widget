@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 	"github.com/nayeemnishaat/go-web-app/web/controller"
 	"github.com/nayeemnishaat/go-web-app/web/lib"
@@ -18,6 +19,7 @@ import (
 
 const VERSION = "1.0.0"
 const CSS_VERSION = "1"
+const SESSION_LIFETIME = 24 * time.Hour
 
 func main() {
 	var app lib.Application
@@ -38,6 +40,10 @@ func main() {
 	db := lib.InitDB()
 	defer db.Close()
 	app.DB = &model.SqlDB{Pool: db}
+
+	lib.Session = scs.New()
+	lib.Session.Lifetime = SESSION_LIFETIME
+	app.Session = *lib.Session
 
 	tApp := tmpl.InitApp(&app)
 	controller.InitApp(tApp)
