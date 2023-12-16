@@ -111,7 +111,16 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["first_name"] = firstName
 	data["last_name"] = lastName
 
-	if err := app.RenderTemplate(w, r, "succeeded", &template.TemplateData{Data: data}); err != nil {
+	app.Session.Put(r.Context(), "receipt", data)
+
+	http.Redirect(w, r, "/terminal/receipt", http.StatusSeeOther)
+}
+
+func (app *Application) Receipt(w http.ResponseWriter, r *http.Request) {
+	data := app.Session.Get(r.Context(), "receipt").(map[string]any)
+	// app.Session.Remove(r.Context(), "receipt")
+
+	if err := app.RenderTemplate(w, r, "receipt", &template.TemplateData{Data: data}); err != nil {
 		app.ErrorLog.Println(err)
 	}
 }

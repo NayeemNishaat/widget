@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"html/template"
@@ -22,6 +23,8 @@ const CSS_VERSION = "1"
 const SESSION_LIFETIME = 24 * time.Hour
 
 func main() {
+	gob.Register(map[string]any{}) // Important: Registering session variable type.
+
 	var app lib.Application
 	flag.IntVar(&app.Port, "port", 3000, "Server Port")
 	flag.StringVar(&app.Env, "env", "dev", "App Env {dev|prod}")
