@@ -28,8 +28,8 @@ func (m *SqlDB) InsertOrder(order Order) (int, error) {
 		insert into orders
 			(widget_id, transaction_id, status_id, quantity, customer_id,
 			amount, created_at, updated_at)
-		values (?, ?, ?, ?, ?, ?, ?, ?)
-	`
+		values ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING id;`
 
 	err := m.QueryRow(ctx, stmt,
 		order.WidgetID,
