@@ -10,7 +10,7 @@ type Order struct {
 	ID            int       `json:"id"`
 	WidgetID      int       `json:"widget_id"`
 	TransactionID int       `json:"transaction_id"`
-	CustomerID    int       `json:"customer_id"`
+	CustomerID    int       `json:"customers_id"`
 	StatusID      int       `json:"status_id"`
 	Quantity      int       `json:"quantity"`
 	Amount        int       `json:"amount"`
@@ -26,7 +26,7 @@ func (m *SqlDB) InsertOrder(order Order) (int, error) {
 	var id int
 	stmt := `
 		insert into orders
-			(widget_id, transaction_id, status_id, quantity, customer_id,
+			(widget_id, transaction_id, status_id, quantity, customers_id,
 			amount, created_at, updated_at)
 		values ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;`
