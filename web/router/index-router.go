@@ -9,6 +9,7 @@ import (
 func RootRouter() http.Handler {
 	mux := chi.NewRouter()
 
+	mux.Mount("/", HomeRouter())
 	mux.Mount("/terminal", TerminalRouter())
 	mux.Mount("/ecom", EcomRouter())
 
