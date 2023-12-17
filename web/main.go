@@ -23,7 +23,7 @@ const CSS_VERSION = "1"
 const SESSION_LIFETIME = 24 * time.Hour
 
 func main() {
-	gob.Register(map[string]any{}) // Important: Registering session variable type.
+	gob.Register(lib.TransactionData{}) // Important: Registering session variable type.
 
 	var app lib.Application
 	flag.IntVar(&app.Port, "port", 3000, "Server Port")
