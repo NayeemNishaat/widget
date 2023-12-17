@@ -137,11 +137,52 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/terminal/receipt", http.StatusSeeOther)
 }
 
+// VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transactions
+func (app *Application) VirtualPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+	txnData, err := app.GetTransactionData(r)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	// create a new transaction
+	txn := model.Transactions{
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		LastFour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		BankReturnCode:      txnData.BankReturnCode,
+		PaymentIntent:       txnData.PaymentIntentID,
+		PaymentMethod:       txnData.PaymentMethodID,
+		TransactionStatusID: 7,
+	}
+
+	_, err = app.SaveTransaction(txn)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	// write this data to session, and then redirect user to new page
+	app.Session.Put(r.Context(), "receipt", txnData)
+	http.Redirect(w, r, "/terminal/virtual-receipt", http.StatusSeeOther)
+}
+
 func (app *Application) Receipt(w http.ResponseWriter, r *http.Request) {
 	txn := app.Session.Get(r.Context(), "receipt").(webLib.TransactionData)
 	// app.Session.Remove(r.Context(), "receipt")
 
 	if err := app.RenderTemplate(w, r, "receipt", &template.TemplateData{Data: map[string]any{"txn": txn}}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
+func (app *Application) VirtualReceipt(w http.ResponseWriter, r *http.Request) {
+	txn := app.Session.Get(r.Context(), "receipt").(webLib.TransactionData)
+	// app.Session.Remove(r.Context(), "receipt")
+
+	if err := app.RenderTemplate(w, r, "virtual-receipt", &template.TemplateData{Data: map[string]any{"txn": txn}}); err != nil {
 		app.ErrorLog.Println(err)
 	}
 }
