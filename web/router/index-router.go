@@ -14,9 +14,8 @@ func RootRouter() http.Handler {
 	mux.Use(middleware.SessionLoad)
 
 	mux.Mount("/", HomeRouter())
-	mux.Mount("/terminal", TerminalRouter())
-
-	mux.Get("/ecom/widget/{id}", controller.App.ChargeOncePage)
+	mux.Get("/terminal", controller.App.TerminalPage)
+	mux.Mount("/ecom", EcomRouter())
 
 	fileServer := http.FileServer(http.Dir("./public"))
 	mux.Handle("/public/*", http.StripPrefix("/public", fileServer))
