@@ -70,6 +70,9 @@ func Serve(app *lib.Application) error {
 	}
 
 	app.InfoLog.Printf("Starting server on %s mode on port %d\n", app.Env, app.Port)
+	if app.Env == "dev" {
+		fmt.Printf("http://localhost:%d\n", app.Port)
+	}
 
 	return srv.ListenAndServe()
 }

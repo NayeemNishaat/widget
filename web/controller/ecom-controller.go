@@ -237,10 +237,16 @@ func (app *Application) ChargeOncePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Application) BronzePlan(w http.ResponseWriter, r *http.Request) {
-	intMap := make(map[string]int)
-	intMap["plan_id"] = 1
+	widget, err := app.DB.GetWidget(2)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
 
-	if err := app.RenderTemplate(w, r, "bronze-plan", &template.TemplateData{IntMap: intMap}); err != nil {
+	data := make(map[string]any)
+	data["widget"] = widget
+
+	if err := app.RenderTemplate(w, r, "bronze-plan", &template.TemplateData{Data: data}); err != nil {
 		app.ErrorLog.Println(err)
 	}
 }
