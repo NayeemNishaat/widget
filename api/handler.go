@@ -73,3 +73,26 @@ func (app *application) getWidgetByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
 }
+
+func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, r *http.Request) {
+	var data lib.StripePayload
+	err := json.NewDecoder(r.Body).Decode(&data)
+
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	okay := true
+	msg := ""
+
+	out, err := json.MarshalIndent(map[string]any{"OK": okay, "Message": msg}, "", "  ")
+
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
