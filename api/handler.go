@@ -83,8 +83,23 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		return
 	}
 
+	card := lib.Card{Secret: app.Stripe.Secret, Key: app.Stripe.Key, Currency: data.Currency}
+
+	stripeCustomer, msg, err := card.CreateCustomer(data.PaymentMethod, data.Email)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	subscriptionID, err := card.SubscribeToPlan(stripeCustomer, data.Plan, data.Email, data.LastFour, "")
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	app.InfoLog.Println(subscriptionID)
+
 	okay := true
-	msg := ""
 
 	out, err := json.MarshalIndent(map[string]any{"OK": okay, "Message": msg}, "", "  ")
 
