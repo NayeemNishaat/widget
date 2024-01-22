@@ -179,6 +179,12 @@ func (app *Application) Receipt(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *Application) BronzeReceipt(w http.ResponseWriter, r *http.Request) {
+	if err := app.RenderTemplate(w, r, "bronze-receipt", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
 func (app *Application) VirtualReceipt(w http.ResponseWriter, r *http.Request) {
 	txn := app.Session.Get(r.Context(), "receipt").(webLib.TransactionData)
 	// app.Session.Remove(r.Context(), "receipt")

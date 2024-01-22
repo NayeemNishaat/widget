@@ -161,7 +161,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			LastFour:            data.LastFour,
 			ExpiryMonth:         data.ExpiryMonth,
 			ExpiryYear:          data.ExpiryYear,
-			TransactionStatusID: 2,
+			TransactionStatusID: 7,
 		}
 
 		txnID, err := app.SaveTxn(txn)
@@ -171,7 +171,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		}
 
 		// Create Order
-		order := model.Order{WidgetID: productID, TransactionID: txnID, CustomerID: customerID, StatusID: 1, Quantity: 1, Amount: amount, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+		order := model.Order{WidgetID: productID, TransactionID: txnID, CustomerID: customerID, StatusID: 4, Quantity: 1, Amount: amount, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 
 		_, err = app.SaveOrder(order)
 		if err != nil {
