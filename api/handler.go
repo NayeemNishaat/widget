@@ -190,3 +190,51 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
 }
+
+func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) {
+	var userInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := lib.ReadJSON(w, r, &userInput)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	user, err := app.DB.GetUserByEmail(userInput.Email)
+	if err != nil {
+		lib.InvalidCredentials(w)
+		return
+	}
+
+	validPassword, err := lib.PasswordMatches(user.Password, userInput.Password)
+	if err != nil {
+		lib.InvalidCredentials(w)
+		return
+	}
+
+	if !validPassword {
+		lib.InvalidCredentials(w)
+		return
+	}
+
+	var payload struct {
+		Error   bool   `json:"error"`
+		Message string `json:"mesage"`
+	}
+
+	payload.Error = false
+	payload.Message = "Success!"
+
+	// out, err := json.MarshalIndent(payload, "", "\t")
+	// if err != nil {
+	// 	app.ErrorLog.Println(err)
+	// }
+
+	// w.Header().Set("Content-Type", "application/json")
+	// w.Write(out)
+
+	_ = lib.WriteJSON(w, http.StatusOK, payload)
+}
