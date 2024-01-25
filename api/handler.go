@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -209,6 +210,7 @@ func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Point: Validate Password
 	validPassword, err := lib.PasswordMatches(user.Password, userInput.Password)
 	if err != nil {
 		lib.InvalidCredentials(w)
@@ -220,13 +222,22 @@ func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Point: Generate Token
+	token, err := lib.GenerateToken(user.ID, 24*time.Hour, lib.ScopeAuthentication)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
 	var payload struct {
-		Error   bool   `json:"error"`
-		Message string `json:"mesage"`
+		Error   bool       `json:"error"`
+		Message string     `json:"mesage"`
+		Token   *lib.Token `json:"authentication_token"`
 	}
 
 	payload.Error = false
-	payload.Message = "Success!"
+	payload.Message = fmt.Sprintf("Token for %s is created.", userInput.Email)
+	payload.Token = token
 
 	// out, err := json.MarshalIndent(payload, "", "\t")
 	// if err != nil {
