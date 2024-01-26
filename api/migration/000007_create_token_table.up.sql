@@ -1,0 +1,10 @@
+CREATE TABLE tokens (
+  id SERIAL PRIMARY KEY, 
+  user_id INTEGER, 
+  name VARCHAR (255), 
+  email VARCHAR (255) UNIQUE NOT NULL,
+  token_hash BIT VARYING (255),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+ALTER TABLE tokens ADD COLUMN created_at TIMESTAMP DEFAULT NOW();

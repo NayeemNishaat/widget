@@ -11,14 +11,15 @@
 - /Users/labyrinth/.go/bin/migrate -path ./api/migration -database pgx5://localhost:5432/ecom -verbose up
 <!-- /Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" -verbose up -->
 
-## Run Migration Up
+## Run Migration Down
 
 - /Users/labyrinth/.go/bin/migrate -path ./api/migration -database pgx5://localhost:5432/ecom -verbose down
 
 ## Resolve Migration Error
 
 - migrate -path database/migration/ -database "pgx5://username:secretkey@localhost:5432/database_name?sslmode=disable" force <VERSION>
-<!-- /Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" force 1 -->
+  <!-- /Users/labyrinth/.go/bin/migrate -path ./api/migration -database "postgres://localhost:5432/ecom?sslmode=disable" force 1 -->
+  <!-- New Version -1 -->
 
 # Makefile
 

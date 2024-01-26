@@ -223,16 +223,23 @@ func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Point: Generate Token
-	token, err := lib.GenerateToken(user.ID, 24*time.Hour, lib.ScopeAuthentication)
+	token, err := model.GenerateToken(user.ID, 24*time.Hour, model.ScopeAuthentication)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	// Point: Save to DB
+	err = app.DB.InsertToken(token, user)
 	if err != nil {
 		lib.BadRequest(w, r, err)
 		return
 	}
 
 	var payload struct {
-		Error   bool       `json:"error"`
-		Message string     `json:"mesage"`
-		Token   *lib.Token `json:"authentication_token"`
+		Error   bool         `json:"error"`
+		Message string       `json:"mesage"`
+		Token   *model.Token `json:"authentication_token"`
 	}
 
 	payload.Error = false
