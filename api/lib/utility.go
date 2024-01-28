@@ -52,7 +52,7 @@ func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Head
 func BadRequest(w http.ResponseWriter, r *http.Request, err error) error {
 	var payload struct {
 		Error   bool   `json:"error"`
-		Message string `json:"mesage"`
+		Message string `json:"message"`
 	}
 
 	payload.Error = true

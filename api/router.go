@@ -23,6 +23,7 @@ func Router() http.Handler {
 	mux.Post("/api/v1/create-customer-and-subscribe-to-plan", app.createCustomerAndSubscribeToPlan)
 
 	mux.Post("/api/v1/authenticate", app.createAuthToken)
+	mux.Post("/api/v1/is-authenticated", app.checkAuthentication)
 
 	return mux
 }

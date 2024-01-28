@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base32"
+	"log"
 	"time"
 )
 
@@ -44,14 +45,46 @@ func (m *SqlDB) InsertToken(t *Token, u User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `INSERT INTO tokens (user_id, name, email, token_hash, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)`
+	stmt := `INSERT INTO tokens (user_id, name, email, token_hash, expiry, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
-	row := m.QueryRow(ctx, stmt, u.ID, u.LastName, u.Email, t.Hash, time.Now(), time.Now())
-	err := row.Scan()
+	_, err := m.Exec(ctx, stmt, u.ID, u.LastName, u.Email, t.Hash, t.Expiry, time.Now(), time.Now())
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (m *SqlDB) GetUserForToken(token string) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	tokenHash := sha256.Sum256([]byte(token))
+	var user User
+
+	query := `
+		select
+			u.id, u.first_name, u.last_name, u.email
+		from
+			users u
+			inner join tokens t on (u.id = t.user_id)
+		where
+			t.token_hash = $1
+			and t.expiry > $2
+	`
+
+	err := m.QueryRow(ctx, query, tokenHash[:], time.Now()).Scan( // [:] copies the slice to an array
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+	)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &user, nil
 }

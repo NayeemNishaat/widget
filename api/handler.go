@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -255,4 +257,43 @@ func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) 
 	// w.Write(out)
 
 	_ = lib.WriteJSON(w, http.StatusOK, payload)
+}
+
+func (app *application) authenticateToken(r *http.Request) (*model.User, error) {
+	authorizationHeader := r.Header.Get("Authorization")
+
+	if authorizationHeader == "" {
+		return nil, errors.New("no authorization header received")
+	}
+
+	headerParts := strings.Split(authorizationHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		return nil, errors.New("no authorization header received")
+	}
+
+	token := headerParts[1]
+	if len(token) != 26 {
+		return nil, errors.New("authorization token wrong size")
+	}
+
+	user, err := app.DB.GetUserForToken(token)
+	if err != nil {
+		return nil, errors.New("no matching user found")
+	}
+
+	return user, nil
+}
+
+func (app *application) checkAuthentication(w http.ResponseWriter, r *http.Request) {
+	user, err := app.authenticateToken(r)
+	if err != nil {
+		lib.InvalidCredentials(w)
+		return
+	}
+
+	payload := struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}{Error: false, Message: fmt.Sprintf("authenticated user %s", user.Email)}
+	lib.WriteJSON(w, http.StatusOK, payload)
 }
