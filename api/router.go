@@ -25,8 +25,10 @@ func Router() http.Handler {
 	mux.Post("/api/v1/authenticate", app.createAuthToken)
 	mux.Post("/api/v1/is-authenticated", app.checkAuthentication)
 
-	mux.Route("/api/admin", func(r chi.Router) {
-		mux.Use(app.Auth)
+	mux.Route("/api/v1/admin", func(r chi.Router) {
+		r.Use(app.Auth)
+
+		r.Post("/virtual-terminal-succeeded", app.VirtualTerminalPaymentSucceeded)
 	})
 
 	return mux

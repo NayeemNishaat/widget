@@ -297,3 +297,66 @@ func (app *application) checkAuthentication(w http.ResponseWriter, r *http.Reque
 	}{Error: false, Message: fmt.Sprintf("authenticated user %s", user.Email)}
 	lib.WriteJSON(w, http.StatusOK, payload)
 }
+
+func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+	var txnData struct {
+		PaymentAmount   int    `json:"amount"`
+		PaymentCurrency string `json:"currency"`
+		FirstName       string `json:"first_name"`
+		LastName        string `json:"last_name"`
+		Email           string `json:"email"`
+		PaymentIntent   string `json:"payment_intent"`
+		PaymentMethod   string `json:"payment_method"`
+		BankReturnCode  string `json:"bank_return_code"`
+		ExpiryMonth     int    `json:"expiry_month"`
+		ExpiryYear      int    `json:"expiry_year"`
+		LastFour        string `json:"last_four"`
+	}
+
+	err := lib.ReadJSON(w, r, &txnData)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	card := lib.Card{
+		Secret: app.Stripe.Secret,
+		Key:    app.Stripe.Secret,
+	}
+
+	pi, err := card.RetrievePaymentIntent(txnData.PaymentIntent)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	pm, err := card.GetPaymentMethod(txnData.PaymentMethod)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	txnData.LastFour = pm.Card.Last4
+	txnData.ExpiryMonth = int(pm.Card.ExpMonth)
+	txnData.ExpiryYear = int(pm.Card.ExpYear)
+
+	txn := model.Transactions{
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		LastFour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		BankReturnCode:      pi.LatestCharge.ID,
+		PaymentIntent:       txnData.PaymentIntent,
+		PaymentMethod:       txnData.PaymentMethod,
+		TransactionStatusID: 7,
+	}
+
+	_, err = app.SaveTxn(txn)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, txn)
+}
