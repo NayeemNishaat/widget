@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alexedwards/scs/pgxstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 	"github.com/nayeemnishaat/go-web-app/web/controller"
@@ -46,6 +47,7 @@ func main() {
 
 	lib.Session = scs.New()
 	lib.Session.Lifetime = SESSION_LIFETIME
+	lib.Session.Store = pgxstore.New(db)
 	app.Session = *lib.Session
 
 	tApp := tmpl.InitApp(&app)

@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	github.com/alexedwards/scs/pgxstore v0.0.0-20231113091146-cef4b05350c8
 	github.com/go-chi/cors v1.2.1
 	github.com/stripe/stripe-go/v76 v76.7.0 // indirect
 )
