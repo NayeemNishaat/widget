@@ -19,7 +19,10 @@ func RootRouter() http.Handler {
 
 	mux.Mount("/ecom", EcomRouter())
 
-	mux.Get("/terminal", controller.App.TerminalPage)
+	mux.Route("/admin", func(r chi.Router) {
+		mux.Use(middleware.Auth)
+		mux.Get("/terminal", controller.App.TerminalPage)
+	})
 
 	fileServer := http.FileServer(http.Dir("./public"))
 	mux.Handle("/public/*", http.StripPrefix("/public", fileServer))

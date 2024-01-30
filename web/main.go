@@ -53,6 +53,8 @@ func main() {
 
 	app.RootRouter = router.RootRouter()
 
+	lib.SetConfig(&app)
+
 	err := Serve(&app)
 	if err != nil {
 		log.Fatal(err)

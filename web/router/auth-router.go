@@ -11,6 +11,8 @@ func AuthRouter() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Get("/login", controller.App.LoginPage)
+	mux.Post("/login", controller.App.PostLoginPage)
+	mux.Get("/logout", controller.App.Logout)
 
 	return mux
 }
