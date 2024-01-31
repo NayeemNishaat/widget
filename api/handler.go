@@ -360,3 +360,22 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 
 	lib.WriteJSON(w, http.StatusOK, txn)
 }
+
+func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Email string `json:"email"`
+	}
+
+	err := lib.ReadJSON(w, r, &payload)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var data struct {
+		Link string
+	}
+	data.Link = "http://www.unb.ca"
+
+	// send mail
+}

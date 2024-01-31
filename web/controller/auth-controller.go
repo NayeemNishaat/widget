@@ -37,3 +37,9 @@ func (app *Application) Logout(w http.ResponseWriter, r *http.Request) {
 	app.Session.RenewToken(r.Context())
 	http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 }
+
+func (app *Application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	if err := app.RenderTemplate(w, r, "forgot-password", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
