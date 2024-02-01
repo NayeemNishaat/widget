@@ -25,6 +25,8 @@ type config struct {
 		Password string
 		Port     int
 	}
+	MailSecret  string
+	FrontendURL string
 }
 
 type application struct {
@@ -38,6 +40,7 @@ var app application
 func initApp() {
 	flag.IntVar(&app.Port, "port", 4000, "Server Port")
 	flag.StringVar(&app.Env, "env", "dev", "App Env {dev|prod|maint}")
+	flag.StringVar(&app.FrontendURL, "frontend_url", "http://localhost:4000", "Frontend Url")
 
 	flag.Parse()
 
@@ -53,6 +56,8 @@ func initApp() {
 		app.SMTP.Port = intPort
 	}
 	app.SMTP.Username = os.Getenv("SMTP_USERNAME")
+
+	app.MailSecret = os.Getenv("MAIL_SECRET")
 
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
