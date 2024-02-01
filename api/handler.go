@@ -378,4 +378,20 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	data.Link = "http://www.unb.ca"
 
 	// send mail
+	err = app.SendMail("info@widgets.com", payload.Email, "Password Reset Request", "password-reset", data)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Success"
+
+	lib.WriteJSON(w, http.StatusCreated, resp)
 }
