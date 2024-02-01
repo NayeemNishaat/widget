@@ -1,5 +1,7 @@
 **To overcome the issue about not being able to create new methods on a struct in a different package we can create a config file in lib package and create a initConfig function that we will call from main function to initialize app config and we will import this init function to get the app config that we might need in handlers.**
 
+**Better way of managing ENV Vars is using .env file and use godotenv pkg to load the env vars**
+
 # Migration
 
 ## Create

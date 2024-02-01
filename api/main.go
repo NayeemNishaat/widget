@@ -6,17 +6,24 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/nayeemnishaat/go-web-app/api/lib"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 )
 
 func main() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	initApp()
 	db := lib.InitDB()
 	defer db.Close()
 	app.DB = &model.SqlDB{Pool: db}
 
-	err := serve(&app)
+	err = serve(&app)
 	if err != nil {
 		log.Fatal(err)
 	}
