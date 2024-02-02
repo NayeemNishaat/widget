@@ -365,7 +365,6 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	var payload struct {
 		Email string `json:"email"`
 	}
-
 	err := lib.ReadJSON(w, r, &payload)
 	if err != nil {
 		lib.BadRequest(w, r, err)
@@ -380,7 +379,7 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	// verify email exists
 	_, err = app.DB.GetUserByEmail(payload.Email)
 	if err != nil {
-		resp.Error = false
+		resp.Error = true
 		resp.Message = "Email doesn't exist!"
 
 		lib.WriteJSON(w, http.StatusAccepted, resp)
