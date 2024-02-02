@@ -372,10 +372,30 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	// verify email exists
+	_, err = app.DB.GetUserByEmail(payload.Email)
+	if err != nil {
+		resp.Error = false
+		resp.Message = "Email doesn't exist!"
+
+		lib.WriteJSON(w, http.StatusAccepted, resp)
+		return
+	}
+
+	link := fmt.Sprintf("%s/reset-password?email=%s", app.config.FrontendURL, payload.Email)
+	sign := lib.Signer{Secret: []byte(app.config.SigningSecret)}
+
+	signedLink := sign.GenerateTokenFromString(link)
+
 	var data struct {
 		Link string
 	}
-	data.Link = "http://www.unb.ca"
+	data.Link = signedLink
 
 	// send mail
 	err = app.SendMail("info@widgets.com", payload.Email, "Password Reset Request", "password-reset", data)
@@ -383,11 +403,6 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		app.ErrorLog.Println(err)
 		lib.BadRequest(w, r, err)
 		return
-	}
-
-	var resp struct {
-		Error   bool   `json:"error"`
-		Message string `json:"message"`
 	}
 
 	resp.Error = false

@@ -25,8 +25,8 @@ type config struct {
 		Password string
 		Port     int
 	}
-	MailSecret  string
-	FrontendURL string
+	SigningSecret string
+	FrontendURL   string
 }
 
 type application struct {
@@ -57,7 +57,7 @@ func initApp() {
 	}
 	app.SMTP.Username = os.Getenv("SMTP_USERNAME")
 
-	app.MailSecret = os.Getenv("MAIL_SECRET")
+	app.SigningSecret = os.Getenv("MAIL_SECRET")
 
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
