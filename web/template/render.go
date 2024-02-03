@@ -70,7 +70,7 @@ func (app *Application) RenderTemplate(w http.ResponseWriter, r *http.Request, p
 
 	_, templateInMap := app.TemplateCache[templateToRender]
 
-	if app.Config.Env == "prod" && templateInMap {
+	if templateInMap {
 		t = app.TemplateCache[templateToRender]
 	} else {
 		t, err = app.parseTemplate(partials, page, templateToRender)
