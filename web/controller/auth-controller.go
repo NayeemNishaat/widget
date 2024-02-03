@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/nayeemnishaat/go-web-app/api/lib"
 	"github.com/nayeemnishaat/go-web-app/web/template"
 )
 
@@ -40,6 +42,34 @@ func (app *Application) Logout(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := app.RenderTemplate(w, r, "forgot-password", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
+func (app *Application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
+	theURL := r.RequestURI
+
+	testURL := fmt.Sprintf("%s%s", app.FrontendURL, theURL)
+
+	signer := lib.Signer{Secret: []byte(app.SigningSecret)}
+	valid := signer.VerifyToken(testURL)
+
+	if !valid {
+		app.ErrorLog.Println("Invalid URL (Tampered)")
+		return
+	}
+
+	// check expiry
+	expired := signer.Expired(testURL, 60)
+	if expired {
+		app.ErrorLog.Println("Link Expired")
+		return
+	}
+
+	data := make(map[string]any)
+	data["email"] = r.URL.Query().Get("email")
+
+	if err := app.RenderTemplate(w, r, "reset-password", &template.TemplateData{Data: data}); err != nil {
 		app.ErrorLog.Println(err)
 	}
 }

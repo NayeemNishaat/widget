@@ -57,7 +57,7 @@ func initApp() {
 	}
 	app.SMTP.Username = os.Getenv("SMTP_USERNAME")
 
-	app.SigningSecret = os.Getenv("MAIL_SECRET")
+	app.SigningSecret = os.Getenv("SIGNING_SECRET")
 
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

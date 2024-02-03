@@ -14,6 +14,7 @@ func AuthRouter() http.Handler {
 	mux.Post("/login", controller.App.PostLoginPage)
 	mux.Get("/logout", controller.App.Logout)
 	mux.Get("/forgot-password", controller.App.ForgotPassword)
+	mux.Get("/reset-password", controller.App.ShowResetPassword)
 
 	return mux
 }

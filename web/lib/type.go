@@ -20,8 +20,10 @@ type Config struct {
 		Secret string
 		Key    string
 	}
-	DB      *model.SqlDB
-	Session scs.SessionManager
+	DB            *model.SqlDB
+	Session       scs.SessionManager
+	SigningSecret string
+	FrontendURL   string
 }
 
 type Application struct {

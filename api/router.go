@@ -25,6 +25,7 @@ func Router() http.Handler {
 	mux.Post("/api/v1/authenticate", app.createAuthToken)
 	mux.Post("/api/v1/is-authenticated", app.checkAuthentication)
 	mux.Post("/api/v1/forgot-password", app.sendPasswordResetEmail)
+	mux.Post("/api/v1/reset-password", app.resetPassword)
 
 	mux.Route("/api/v1/admin", func(r chi.Router) {
 		r.Use(app.Auth)

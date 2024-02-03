@@ -13,6 +13,7 @@ import (
 	"github.com/nayeemnishaat/go-web-app/api/lib"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 	"github.com/stripe/stripe-go/v76"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *application) getPaymentIntent(w http.ResponseWriter, r *http.Request) {
@@ -406,6 +407,47 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 
 	resp.Error = false
 	resp.Message = "Success"
+
+	lib.WriteJSON(w, http.StatusCreated, resp)
+}
+
+func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := lib.ReadJSON(w, r, &payload)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	user, err := app.DB.GetUserByEmail(payload.Email)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	newHash, err := bcrypt.GenerateFromPassword([]byte(payload.Password), 12)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	err = app.DB.UpdatePassword(user, string(newHash))
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Password Updated!"
 
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }

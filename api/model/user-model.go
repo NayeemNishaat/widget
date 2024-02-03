@@ -69,3 +69,17 @@ func (m *SqlDB) Authenticate(email, password string) (int, error) {
 
 	return id, nil
 }
+
+func (m *SqlDB) UpdatePassword(u User, hash string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE users SET password = $1 WHERE id = $2`
+	_, err := m.Exec(ctx, stmt, hash, u.ID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
