@@ -12,12 +12,6 @@ import (
 	"github.com/nayeemnishaat/go-web-app/web/template"
 )
 
-func (app *Application) TerminalPage(w http.ResponseWriter, r *http.Request) {
-	if err := app.RenderTemplate(w, r, "terminal", &template.TemplateData{StringMap: map[string]string{"publishable_key": app.Stripe.Key}}, "stripe-js"); err != nil {
-		app.ErrorLog.Println(err)
-	}
-}
-
 // GetTransactionData gets txn data from post and stripe
 func (app *Application) GetTransactionData(r *http.Request) (webLib.TransactionData, error) {
 	var txnData webLib.TransactionData
@@ -139,7 +133,7 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 }
 
 // VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transactions
-func (app *Application) VirtualPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+/* func (app *Application) VirtualPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
 	txnData, err := app.GetTransactionData(r)
 	if err != nil {
 		app.ErrorLog.Println(err)
@@ -168,7 +162,7 @@ func (app *Application) VirtualPaymentSucceeded(w http.ResponseWriter, r *http.R
 	// write this data to session, and then redirect user to new page
 	app.Session.Put(r.Context(), "receipt", txnData)
 	http.Redirect(w, r, "/ecom/virtual-receipt", http.StatusSeeOther)
-}
+} */
 
 func (app *Application) Receipt(w http.ResponseWriter, r *http.Request) {
 	txn := app.Session.Get(r.Context(), "receipt").(webLib.TransactionData)
@@ -185,14 +179,14 @@ func (app *Application) BronzeReceipt(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *Application) VirtualReceipt(w http.ResponseWriter, r *http.Request) {
+/* func (app *Application) VirtualReceipt(w http.ResponseWriter, r *http.Request) {
 	txn := app.Session.Get(r.Context(), "receipt").(webLib.TransactionData)
 	// app.Session.Remove(r.Context(), "receipt")
 
 	if err := app.RenderTemplate(w, r, "virtual-receipt", &template.TemplateData{Data: map[string]any{"txn": txn}}); err != nil {
 		app.ErrorLog.Println(err)
 	}
-}
+} */
 
 // SaveCustomer saves a customer and returns id
 func (app *Application) SaveCustomer(firstName, lastName, email string) (int, error) {
