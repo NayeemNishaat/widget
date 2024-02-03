@@ -40,7 +40,7 @@ var app application
 func initApp() {
 	flag.IntVar(&app.Port, "port", 4000, "Server Port")
 	flag.StringVar(&app.Env, "env", "dev", "App Env {dev|prod|maint}")
-	flag.StringVar(&app.FrontendURL, "frontend_url", "http://localhost:4000", "Frontend Url")
+	flag.StringVar(&app.FrontendURL, "frontend_url", "http://localhost:3000", "Frontend Url")
 
 	flag.Parse()
 

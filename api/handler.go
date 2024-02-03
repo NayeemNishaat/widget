@@ -387,7 +387,7 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	link := fmt.Sprintf("%s/reset-password?email=%s", app.config.FrontendURL, payload.Email)
+	link := fmt.Sprintf("%s/auth/reset-password?email=%s", app.config.FrontendURL, payload.Email)
 	sign := lib.Signer{Secret: []byte(app.config.SigningSecret)}
 
 	signedLink := sign.GenerateTokenFromString(link)
