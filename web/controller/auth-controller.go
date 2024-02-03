@@ -48,8 +48,8 @@ func (app *Application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
 	theURL := r.RequestURI
-
 	testURL := fmt.Sprintf("%s%s", app.FrontendURL, theURL)
+	email := r.URL.Query().Get("email")
 
 	signer := lib.Signer{Secret: []byte(app.SigningSecret)}
 	valid := signer.VerifyToken(testURL)
@@ -66,8 +66,18 @@ func (app *Application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	encryptor := lib.Encryption{
+		Key: []byte(app.SigningSecret),
+	}
+
+	encryptedEmail, err := encryptor.Encrypt(email)
+	if err != nil {
+		app.ErrorLog.Println("Encryption Failed")
+		return
+	}
+
 	data := make(map[string]any)
-	data["email"] = r.URL.Query().Get("email")
+	data["email"] = encryptedEmail
 
 	if err := app.RenderTemplate(w, r, "reset-password", &template.TemplateData{Data: data}); err != nil {
 		app.ErrorLog.Println(err)
