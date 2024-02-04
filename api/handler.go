@@ -494,3 +494,42 @@ func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
 
 	lib.WriteJSON(w, http.StatusOK, order)
 }
+
+func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
+	var chargeToRefund struct {
+		ID            int    `json:"id"`
+		PaymentIntent string `json:"pi"`
+		Amount        int    `json:"amount"`
+		Currency      string `json:"currency"`
+	}
+
+	err := lib.ReadJSON(w, r, chargeToRefund)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	// validate amount
+
+	card := lib.Card{
+		Secret:   app.Stripe.Secret,
+		Key:      app.Stripe.Key,
+		Currency: chargeToRefund.Currency,
+	}
+
+	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Charge Refunded"
+
+	lib.WriteJSON(w, http.StatusCreated, resp)
+}

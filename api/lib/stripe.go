@@ -5,6 +5,7 @@ import (
 	"github.com/stripe/stripe-go/v76/customer"
 	"github.com/stripe/stripe-go/v76/paymentintent"
 	"github.com/stripe/stripe-go/v76/paymentmethod"
+	"github.com/stripe/stripe-go/v76/refund"
 	"github.com/stripe/stripe-go/v76/subscription"
 )
 
@@ -14,13 +15,13 @@ type Card struct {
 	Currency string
 }
 
-type transaction struct {
-	TransactionStatusID int
-	Amount              int
-	Currency            string
-	LastFour            string
-	BankReturnCode      string
-}
+// type transaction struct {
+// 	TransactionStatusID int
+// 	Amount              int
+// 	Currency            string
+// 	LastFour            string
+// 	BankReturnCode      string
+// }
 
 func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.PaymentIntent, string, error) {
 	stripe.Key = c.Secret
@@ -108,6 +109,23 @@ func (c *Card) CreateCustomer(pm, email string) (*stripe.Customer, string, error
 		return nil, msg, err
 	}
 	return cust, "", nil
+}
+
+func (c *Card) Refund(pi string, amount int) error {
+	stripe.Key = c.Secret
+	amountToRefund := int64(amount)
+
+	refundParams := &stripe.RefundParams{
+		Amount:        &amountToRefund,
+		PaymentIntent: &pi,
+	}
+
+	_, err := refund.New(refundParams)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func cardErrorMessage(code stripe.ErrorCode) string {
