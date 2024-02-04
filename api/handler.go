@@ -471,3 +471,26 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 
 	lib.WriteJSON(w, http.StatusOK, allSales)
 }
+
+func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
+	allSales, err := app.DB.GetAllSubscriptions()
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, allSales)
+}
+
+func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	orderID, _ := strconv.Atoi(id)
+
+	order, err := app.DB.GetOrderByID(orderID)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, order)
+}

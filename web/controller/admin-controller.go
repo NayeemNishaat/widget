@@ -23,3 +23,9 @@ func (app *Application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 		app.ErrorLog.Println(err)
 	}
 }
+
+func (app *Application) ShowSale(w http.ResponseWriter, r *http.Request) {
+	if err := app.RenderTemplate(w, r, "sale", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
