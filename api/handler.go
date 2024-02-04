@@ -461,3 +461,13 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }
+
+func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
+	allSales, err := app.DB.GetAllOrders()
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, allSales)
+}
