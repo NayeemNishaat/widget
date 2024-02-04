@@ -503,7 +503,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 		Currency      string `json:"currency"`
 	}
 
-	err := lib.ReadJSON(w, r, chargeToRefund)
+	err := lib.ReadJSON(w, r, &chargeToRefund)
 	if err != nil {
 		lib.BadRequest(w, r, err)
 		return
@@ -520,6 +520,13 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 	if err != nil {
 		lib.BadRequest(w, r, err)
+		return
+	}
+
+	// update status in db
+	err = app.DB.UpdateOrderStatus(chargeToRefund.ID, 5)
+	if err != nil {
+		lib.BadRequest(w, r, errors.New("the charge was refunded but the db could not be updated"))
 		return
 	}
 

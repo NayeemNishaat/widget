@@ -10,7 +10,7 @@ type Order struct {
 	ID            int          `json:"id"`
 	WidgetID      int          `json:"widget_id"`
 	TransactionID int          `json:"transaction_id"`
-	CustomerID    int          `json:"customers_id"`
+	CustomerID    int          `json:"customer_id"`
 	StatusID      int          `json:"status_id"`
 	Quantity      int          `json:"quantity"`
 	Amount        int          `json:"amount"`
@@ -29,7 +29,7 @@ func (m *SqlDB) InsertOrder(order Order) (int, error) {
 	var id int
 	stmt := `
 		insert into orders
-			(widget_id, transaction_id, status_id, quantity, customers_id,
+			(widget_id, transaction_id, status_id, quantity, customer_id,
 			amount, created_at, updated_at)
 		values ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;`
@@ -241,4 +241,18 @@ func (m *SqlDB) GetOrderByID(id int) (Order, error) {
 	}
 
 	return o, nil
+}
+
+func (m *SqlDB) UpdateOrderStatus(id, statusID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE orders SET status_id = $1 WHERE id = $2`
+
+	_, err := m.Exec(ctx, stmt, statusID, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
