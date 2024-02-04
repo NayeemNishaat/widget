@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
         },
     }
 
-    fetch("{{.API}}/api/admin/all-subscriptions", requestOptions)
+    fetch("{{.API}}/api/v1/admin/all-subscriptions", requestOptions)
     .then(response => response.json())
     .then(function (data) {
         console.log(data);
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 item = document.createTextNode(i.widget.name);
                 newCell.appendChild(item);
                 
-                let cur = formatCurrency(i.transaction.amount);
+                let cur = formatCurrency(i.transactions.amount);
                 newCell = newRow.insertCell();
                 item = document.createTextNode(cur + "/month");
                 newCell.appendChild(item);

@@ -55,7 +55,7 @@
                 item = document.createTextNode(i.widget.name);
                 newCell.appendChild(item);
 
-                let cur = formatCurrency(i.transaction.amount);
+                let cur = formatCurrency(i.transactions.amount);
                 newCell = newRow.insertCell();
                 item = document.createTextNode(cur);
                 newCell.appendChild(item);
