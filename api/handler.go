@@ -166,6 +166,8 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			ExpiryMonth:         data.ExpiryMonth,
 			ExpiryYear:          data.ExpiryYear,
 			TransactionStatusID: 7,
+			PaymentIntent:       subscription.ID,
+			PaymentMethod:       data.PaymentMethod,
 		}
 
 		txnID, err := app.SaveTxn(txn)
@@ -537,6 +539,49 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	resp.Error = false
 	resp.Message = "Charge Refunded"
+
+	lib.WriteJSON(w, http.StatusCreated, resp)
+}
+
+func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Request) {
+	var subToCancel struct {
+		ID            int    `json:"id"`
+		PaymentIntent string `json:"pi"`
+		Currency      string `json:"currency"`
+	}
+
+	err := lib.ReadJSON(w, r, &subToCancel)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	card := lib.Card{
+		Secret:   app.config.Stripe.Secret,
+		Key:      app.config.Stripe.Key,
+		Currency: subToCancel.Currency,
+	}
+
+	err = card.CancelSubscription(subToCancel.PaymentIntent)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	// update status in db
+	err = app.DB.UpdateOrderStatus(subToCancel.ID, 6)
+	if err != nil {
+		lib.BadRequest(w, r, errors.New("the subscription was cancelled but the db could not be updated"))
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Subscription Cancelled"
 
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }
