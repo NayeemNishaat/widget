@@ -463,23 +463,74 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
-	allSales, err := app.DB.GetAllOrders()
+	var payload struct {
+		PageSize    int `json:"page_size"`
+		CurrentPage int `json:"page"`
+	}
+
+	err := lib.ReadJSON(w, r, &payload)
 	if err != nil {
 		lib.BadRequest(w, r, err)
 		return
 	}
+
+	allSales, lastPage, totalRecords, err := app.DB.GetAllOrdersPaginated(payload.PageSize, payload.CurrentPage)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		CurrentPage  int            `json:"current_page"`
+		PageSize     int            `json:"page_size"`
+		LastPage     int            `json:"last_page"`
+		TotalRecords int            `json:"total_records"`
+		Orders       []*model.Order `json:"orders"`
+	}
+
+	resp.CurrentPage = payload.CurrentPage
+	resp.PageSize = payload.PageSize
+	resp.LastPage = lastPage
+	resp.TotalRecords = totalRecords
+	resp.Orders = allSales
 
 	lib.WriteJSON(w, http.StatusOK, allSales)
 }
 
+// AllSubscriptions returns all subscriptions as a slice
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
-	allSales, err := app.DB.GetAllSubscriptions()
+	var payload struct {
+		PageSize    int `json:"page_size"`
+		CurrentPage int `json:"page"`
+	}
+
+	err := lib.ReadJSON(w, r, &payload)
 	if err != nil {
 		lib.BadRequest(w, r, err)
 		return
 	}
 
-	lib.WriteJSON(w, http.StatusOK, allSales)
+	allSales, lastPage, totalRecords, err := app.DB.GetAllSubscriptionsPaginated(payload.PageSize, payload.CurrentPage)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		CurrentPage  int            `json:"current_page"`
+		PageSize     int            `json:"page_size"`
+		LastPage     int            `json:"last_page"`
+		TotalRecords int            `json:"total_records"`
+		Orders       []*model.Order `json:"orders"`
+	}
+
+	resp.CurrentPage = payload.CurrentPage
+	resp.PageSize = payload.PageSize
+	resp.LastPage = lastPage
+	resp.TotalRecords = totalRecords
+	resp.Orders = allSales
+
+	lib.WriteJSON(w, http.StatusOK, resp)
 }
 
 func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
