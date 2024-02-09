@@ -101,7 +101,7 @@ function updateTable(ps, cp) {
                 newCell.appendChild(item);
 
                 newCell = newRow.insertCell();
-                if (i.status_id != 1) {
+                if (i.status_id != 4) {
                     newCell.innerHTML = `<span class="badge bg-danger">Cancelled</span>`;
                 } else {
                     newCell.innerHTML = `<span class="badge bg-success">Charged</span>`;

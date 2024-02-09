@@ -494,7 +494,7 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	resp.TotalRecords = totalRecords
 	resp.Orders = allSales
 
-	lib.WriteJSON(w, http.StatusOK, allSales)
+	lib.WriteJSON(w, http.StatusOK, resp)
 }
 
 // AllSubscriptions returns all subscriptions as a slice

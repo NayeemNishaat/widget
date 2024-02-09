@@ -190,7 +190,7 @@ func (m *SqlDB) GetAllOrdersPaginated(limit, page int) ([]*Order, int, int, erro
 		SELECT COUNT(*)
 		FROM orders o
 		LEFT JOIN widgets w ON (o.widget_id = w.id)
-		WHERE w.is_recurring = 0
+		WHERE w.is_recurring = false
 	`
 
 	var totalRecords int
@@ -294,7 +294,7 @@ func (m *SqlDB) GetAllSubscriptionsPaginated(pageSize, page int) ([]*Order, int,
 		left join transactions t on (o.transaction_id = t.id)
 		left join customers c on (o.customer_id = c.id)
 	where
-		w.is_recurring = 1
+		w.is_recurring = true
 	order by
 		o.created_at desc
 	limit $1 offset $2
@@ -346,7 +346,7 @@ func (m *SqlDB) GetAllSubscriptionsPaginated(pageSize, page int) ([]*Order, int,
 			orders o
 			left join widgets w on (o.widget_id = w.id)
 		where
-			w.is_recurring = 1
+			w.is_recurring = true
 	`
 	var totalRecords int
 	countRow := m.QueryRow(ctx, query)
