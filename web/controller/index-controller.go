@@ -12,4 +12,6 @@ var App *Application
 
 func InitApp(app *template.Application) {
 	App = &Application{app}
+
+	go App.ListenToWsChannel()
 }

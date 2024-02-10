@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/nayeemnishaat/go-web-app/web/controller"
 	"github.com/nayeemnishaat/go-web-app/web/middleware"
 )
 
@@ -13,6 +14,8 @@ func RootRouter() http.Handler {
 	mux.Use(middleware.SessionLoad)
 
 	mux.Mount("/", HomeRouter())
+
+	mux.Get("/ws", controller.App.WsEndpoint)
 
 	mux.Mount("/auth", AuthRouter())
 
