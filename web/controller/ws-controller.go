@@ -61,18 +61,18 @@ func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
 	conn := WebSocketConnection{Conn: ws}
 	clients[conn] = ""
 
-	// Register a close handler
-	conn.SetCloseHandler(func(code int, text string) error {
-		fmt.Printf("Connection closed with code %d: %s", code, text)
-		delete(clients, conn)
-		return nil
-	})
-
 	go app.ListenForWS(&conn)
 }
 
 func (app *Application) ListenForWS(conn *WebSocketConnection) {
-	defer conn.Close()
+	// defer conn.Close()
+
+	// Register a close handler
+	conn.SetCloseHandler(func(code int, text string) error {
+		fmt.Printf("Connection closed with code %d: %s\n", code, text)
+		delete(clients, *conn)
+		return nil
+	})
 
 	// Recover gracefully (it will fire if error in for loop occurs 1000 times)
 	defer func() {
