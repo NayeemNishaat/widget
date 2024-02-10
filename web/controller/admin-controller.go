@@ -51,3 +51,16 @@ func (app *Application) ShowSubscription(w http.ResponseWriter, r *http.Request)
 		app.ErrorLog.Println(err)
 	}
 }
+
+func (app *Application) AllUsers(w http.ResponseWriter, r *http.Request) {
+	if err := app.RenderTemplate(w, r, "all-users", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
+// Sows one user's details
+func (app *Application) OneUser(w http.ResponseWriter, r *http.Request) {
+	if err := app.RenderTemplate(w, r, "one-user", &template.TemplateData{}); err != nil {
+		app.ErrorLog.Println(err)
+	}
+}

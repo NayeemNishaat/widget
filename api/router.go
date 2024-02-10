@@ -38,6 +38,11 @@ func Router() http.Handler {
 
 		r.Post("/refund", app.RefundCharge)
 		r.Post("/cancel-subscription", app.CancelSubscription)
+
+		r.Post("/all-users", app.AllUsers)
+		r.Post("/all-users/{id}", app.OneUser)
+		r.Post("/all-users/edit/{id}", app.EditUser)
+		r.Post("/all-users/delete/{id}", app.DeleteUser)
 	})
 
 	return mux

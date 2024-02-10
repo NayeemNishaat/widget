@@ -19,5 +19,8 @@ func AdminRouter() http.Handler {
 	mux.Get("/sales/{id}", controller.App.ShowSale)
 	mux.Get("/subscriptions/{id}", controller.App.ShowSubscription)
 
+	mux.Get("/all-users", controller.App.AllUsers)
+	mux.Get("/all-users/{id}", controller.App.OneUser)
+
 	return mux
 }

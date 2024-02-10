@@ -634,3 +634,103 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }
+
+// AllUsers returns a JSON file listing all admin users
+func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+	allUsers, err := app.DB.GetAllUsers()
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, allUsers)
+}
+
+// OneUser gets one user by id (from the url) and returns it as JSON
+func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	user, err := app.DB.GetOneUser(userID)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	lib.WriteJSON(w, http.StatusOK, user)
+}
+
+// EditUser is the handler for adding or editing an existing user
+func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	var user model.User
+
+	err := lib.ReadJSON(w, r, &user)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	if userID > 0 {
+		err = app.DB.EditUser(user)
+		if err != nil {
+			lib.BadRequest(w, r, err)
+			return
+		}
+
+		if user.Password != "" {
+			newHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+			if err != nil {
+				lib.BadRequest(w, r, err)
+				return
+			}
+
+			err = app.DB.UpdatePassword(user, string(newHash))
+			if err != nil {
+				lib.BadRequest(w, r, err)
+				return
+			}
+		}
+	} else {
+		newHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+		if err != nil {
+			lib.BadRequest(w, r, err)
+			return
+		}
+		err = app.DB.AddUser(user, string(newHash))
+		if err != nil {
+			lib.BadRequest(w, r, err)
+			return
+		}
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	lib.WriteJSON(w, http.StatusOK, resp)
+}
+
+// DeleteUser deletes a user, and all associated tokens, from the database
+func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	err := app.DB.DeleteUser(userID)
+	if err != nil {
+		lib.BadRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	lib.WriteJSON(w, http.StatusOK, resp)
+}
