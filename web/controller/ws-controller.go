@@ -36,7 +36,12 @@ var clients = make(map[WebSocketConnection]string)
 var wsChan = make(chan WsPayload)
 
 func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgradeConnection.Upgrade(w, r, nil)
+	wUpgrade := w
+	if u, ok := w.(interface{ Unwrap() http.ResponseWriter }); ok {
+		wUpgrade = u.Unwrap()
+	}
+
+	ws, err := upgradeConnection.Upgrade(wUpgrade, r, nil)
 	if err != nil {
 		app.ErrorLog.Println(err)
 		return
@@ -56,11 +61,20 @@ func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
 	conn := WebSocketConnection{Conn: ws}
 	clients[conn] = ""
 
+	// Register a close handler
+	conn.SetCloseHandler(func(code int, text string) error {
+		fmt.Printf("Connection closed with code %d: %s", code, text)
+		delete(clients, conn)
+		return nil
+	})
+
 	go app.ListenForWS(&conn)
 }
 
 func (app *Application) ListenForWS(conn *WebSocketConnection) {
-	// Recover gracefully
+	defer conn.Close()
+
+	// Recover gracefully (it will fire if error in for loop occurs 1000 times)
 	defer func() {
 		if r := recover(); r != nil {
 			app.ErrorLog.Println("Error:", fmt.Sprintf("%v", r))
@@ -71,12 +85,17 @@ func (app *Application) ListenForWS(conn *WebSocketConnection) {
 
 	for {
 		err := conn.ReadJSON(&payload)
+
 		if err != nil {
-			// do nothing
+			// return
+			break
 		} else {
 			payload.Conn = *conn
 			wsChan <- payload
 		}
+
+		// numGoroutines := runtime.NumGoroutine()
+		// fmt.Printf("Number of running goroutines: %d\n", numGoroutines)
 	}
 
 	// to exit from this go routine we can create a function that will be fired when a user disconnects and it will create a done chan and listen to it for an end signal in this function and upon receving the signal we return.
