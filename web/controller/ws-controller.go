@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -33,6 +34,7 @@ var upgradeConnection = websocket.Upgrader{
 }
 
 var clients = make(map[WebSocketConnection]string)
+var clientsMutex sync.Mutex
 var wsChan = make(chan WsPayload)
 
 func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +70,9 @@ func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
 // var ch = make(chan bool, 1) // for buffered chan, the send operation will only block when the buffer is full, and the receive operation will only block when the buffer is empty as it will wait there forever for receving a value
 
 func (app *Application) ListenForWS(conn *WebSocketConnection) {
+	clientsMutex.Lock()
 	defer delete(clients, *conn)
+	clientsMutex.Unlock()
 	defer conn.Close()
 
 	// Register a close handler
@@ -144,7 +148,9 @@ func (app *Application) broadcastToAll(response WsJsonResponse) {
 		if err != nil {
 			app.ErrorLog.Printf("Wesocket error on %s:%s", response.Action, err)
 			_ = client.Close()
+			clientsMutex.Lock()
 			delete(clients, client)
+			clientsMutex.Unlock()
 		}
 	}
 }

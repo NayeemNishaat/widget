@@ -51,6 +51,8 @@ func main() {
 		Version:  version,
 	}
 
+	CreateDirIfNotExist("./microservice/invoice/pdf")
+
 	err := app.serve()
 	if err != nil {
 		log.Fatal(err)
