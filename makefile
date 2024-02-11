@@ -37,17 +37,20 @@ stop_db:
 	@-pkill -SIGTERM -f "postgres"
 # lsof -i :3000
 # lsof -ti :3000
-# fuser 3000/tcp
+# fuser -k 3000/tcp
 # fuser 3000/udp
+
+INVOICE_PORT=5000
 
 start_invoice:
 	cd ./microservice/invoice && go run . &
 
 stop_invoice:
-	@-pkill -SIGTERM -fi "invoice"
+# @-pkill -SIGTERM -fi "invoice"
+	@-lsof -ti:${INVOICE_PORT} | xargs -r kill
 	@echo "Stopped Invoice"
 # ps $34553 # get full process details
-
+# killall "process_name"
 
 
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
