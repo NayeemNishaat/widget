@@ -64,15 +64,21 @@ func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
 	go app.ListenForWS(&conn)
 }
 
+// var ch = make(chan bool) // For unbuffered chan, both the sender and the receiver must be ready for the operation to proceed. The sender will be blocked until the receiver is ready to receive the value, and vice versa.
+// var ch = make(chan bool, 1) // for buffered chan, the send operation will only block when the buffer is full, and the receive operation will only block when the buffer is empty
+
 func (app *Application) ListenForWS(conn *WebSocketConnection) {
-	// defer conn.Close()
+	defer delete(clients, *conn)
+	defer conn.Close()
 
 	// Register a close handler
-	conn.SetCloseHandler(func(code int, text string) error {
-		fmt.Printf("Connection closed with code %d: %s\n", code, text)
-		delete(clients, *conn)
-		return nil
-	})
+	// conn.SetCloseHandler(func(code int, text string) error {
+	// 	fmt.Printf("Connection closed with code %d: %s\n", code, text)
+
+	// 	// ch <- true // unbuffered chan, blocked because receiver is not ready
+	// 	// ch <- true
+	// 	return nil
+	// })
 
 	// Recover gracefully (it will fire if error in for loop occurs 1000 times)
 	defer func() {
@@ -86,6 +92,9 @@ func (app *Application) ListenForWS(conn *WebSocketConnection) {
 	for {
 		err := conn.ReadJSON(&payload)
 
+		// fmt.Println(err, payload, clients)
+		// fmt.Printf("Number of running goroutines: %d\n", runtime.NumGoroutine())
+
 		if err != nil {
 			// return
 			break
@@ -94,11 +103,21 @@ func (app *Application) ListenForWS(conn *WebSocketConnection) {
 			wsChan <- payload
 		}
 
-		// numGoroutines := runtime.NumGoroutine()
-		// fmt.Printf("Number of running goroutines: %d\n", numGoroutines)
-	}
+		// Alt: with channel
+		// v := <-ch // unbuffered, will block until a value is sent to the channel
 
-	// to exit from this go routine we can create a function that will be fired when a user disconnects and it will create a done chan and listen to it for an end signal in this function and upon receving the signal we return.
+		// select {
+		// case val := <-ch:
+		// 	if val {
+		// 		return
+		// 	}
+		// default:
+		// 	fmt.Println("Buffered channel is empty")
+		// }
+
+		// payload.Conn = *conn
+		// wsChan <- payload
+	}
 }
 
 func (app *Application) ListenToWsChannel() {
