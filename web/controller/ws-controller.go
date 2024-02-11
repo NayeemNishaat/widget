@@ -65,7 +65,7 @@ func (app *Application) WsEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // var ch = make(chan bool) // For unbuffered chan, both the sender and the receiver must be ready for the operation to proceed. The sender will be blocked until the receiver is ready to receive the value, and vice versa.
-// var ch = make(chan bool, 1) // for buffered chan, the send operation will only block when the buffer is full, and the receive operation will only block when the buffer is empty
+// var ch = make(chan bool, 1) // for buffered chan, the send operation will only block when the buffer is full, and the receive operation will only block when the buffer is empty as it will wait there forever for receving a value
 
 func (app *Application) ListenForWS(conn *WebSocketConnection) {
 	defer delete(clients, *conn)
@@ -75,8 +75,8 @@ func (app *Application) ListenForWS(conn *WebSocketConnection) {
 	// conn.SetCloseHandler(func(code int, text string) error {
 	// 	fmt.Printf("Connection closed with code %d: %s\n", code, text)
 
-	// 	// ch <- true // unbuffered chan, blocked because receiver is not ready
-	// 	// ch <- true
+	// 	// ch <- true // unbuffered chan, blocked if receiver is not ready
+	// 	ch <- true // buffered chan, blocked if buffer is full
 	// 	return nil
 	// })
 
@@ -104,14 +104,14 @@ func (app *Application) ListenForWS(conn *WebSocketConnection) {
 		}
 
 		// Alt: with channel
-		// v := <-ch // unbuffered, will block until a value is sent to the channel
+		// val := <-ch // This will always block until a value is received for buffered/unbuffered chan
 
 		// select {
 		// case val := <-ch:
 		// 	if val {
 		// 		return
 		// 	}
-		// default:
+		// default: // Important: Without this default: condition it will act as blocking (<-ch) for unbuffered/buffered chan
 		// 	fmt.Println("Buffered channel is empty")
 		// }
 
