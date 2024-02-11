@@ -30,6 +30,17 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// order := Order{
+	// 	ID:        1,
+	// 	Quantity:  3,
+	// 	Amount:    1000,
+	// 	Product:   "Widget",
+	// 	FirstName: "Nayeem",
+	// 	LastName:  "Nishaat",
+	// 	Email:     "nayeem@nishaats",
+	// 	CreatedAt: time.Now(),
+	// }
+
 	// generate a pdf invoice
 	err = app.createInvoicePDF(order)
 	if err != nil {
@@ -40,6 +51,8 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	// create mail
 
 	// send mail with attachment
+
+	// delete attachment
 
 	// send response
 	var resp struct {
@@ -59,7 +72,7 @@ func (app *application) createInvoicePDF(order Order) error {
 
 	importer := gofpdi.NewImporter()
 
-	t := importer.ImportPage(pdf, "./microservice/invoice/pdf/template.pdf", 1, "/MediaBox")
+	t := importer.ImportPage(pdf, "./pdf/template.pdf", 1, "/MediaBox")
 
 	pdf.AddPage()
 
@@ -75,19 +88,19 @@ func (app *application) createInvoicePDF(order Order) error {
 	pdf.CellFormat(97, 8, order.Email, "", 0, "L", false, 0, "")
 
 	pdf.Ln(5)
-	pdf.CellFormat(97, 8, order.CreatedAt.Format("2000-01-01"), "", 0, "L", false, 0, "")
+	pdf.CellFormat(97, 8, order.CreatedAt.Format("2006-01-01"), "", 0, "L", false, 0, "")
 
 	pdf.SetX(58)
 	pdf.SetY(93)
 	pdf.CellFormat(155, 8, order.Product, "", 0, "L", false, 0, "")
 
 	pdf.SetX(166)
-	pdf.CellFormat(20, 8, string(rune(order.Quantity)), "", 0, "C", false, 0, "")
+	pdf.CellFormat(20, 8, fmt.Sprint(order.Quantity), "", 0, "C", false, 0, "")
 
 	pdf.SetX(185)
 	pdf.CellFormat(20, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100)), "", 0, "R", false, 0, "")
 
-	invoicePath := fmt.Sprintf("./microservice/invoice/pdf/%d.pdf", order.ID)
+	invoicePath := fmt.Sprintf("./pdf/%d.pdf", order.ID)
 	err := pdf.OutputFileAndClose(invoicePath)
 	if err != nil {
 		return err
