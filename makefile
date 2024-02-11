@@ -40,6 +40,15 @@ stop_db:
 # fuser 3000/tcp
 # fuser 3000/udp
 
+start_invoice:
+	cd ./microservice/invoice && go run . &
+
+stop_invoice:
+	@-pkill -SIGTERM -fi "invoice"
+	@echo "Stopped Invoice"
+# ps $34553 # get full process details
+
+
 
 # STRIPE_SECRET=sk_test_mXWrR1RN6fjIJnDsLPq1mAGX
 # STRIPE_KEY=pk_test_lOwqX0SiQCGm7wSkqNoBgMLc
