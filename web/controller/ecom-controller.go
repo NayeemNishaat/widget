@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -149,7 +150,6 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	}
 
 	app.Session.Put(r.Context(), "receipt", txnData)
-
 	http.Redirect(w, r, "/ecom/receipt", http.StatusSeeOther)
 }
 
@@ -167,7 +167,7 @@ func (app *Application) callInvoiceMicro(inv webLib.Invoice) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := http.Client{}
+	client := &http.Client{}
 
 	resp, err := client.Do(req)
 
@@ -176,7 +176,11 @@ func (app *Application) callInvoiceMicro(inv webLib.Invoice) error {
 	}
 
 	defer resp.Body.Close()
-	app.InfoLog.Println(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	app.InfoLog.Println(string(body))
 
 	return nil
 }
