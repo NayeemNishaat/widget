@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -121,15 +124,61 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
-	_, err = app.SaveOrder(order)
+	orderID, err := app.SaveOrder(order)
 	if err != nil {
 		app.ErrorLog.Println(err)
 		return
 	}
 
+	// call microservice
+	inv := webLib.Invoice{
+		ID:        orderID,
+		Amount:    order.Amount,
+		Product:   "Widget",
+		Quantity:  order.Quantity,
+		FirstName: txnData.FirstName,
+		LastName:  txnData.LastName,
+		Email:     txnData.Email,
+		CreatedAt: time.Now(),
+	}
+
+	// Todo: Can we call it as a go routine?
+	err = app.callInvoiceMicro(inv)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+
 	app.Session.Put(r.Context(), "receipt", txnData)
 
 	http.Redirect(w, r, "/ecom/receipt", http.StatusSeeOther)
+}
+
+func (app *Application) callInvoiceMicro(inv webLib.Invoice) error {
+	url := fmt.Sprintf("%s/invoice/create-and-send", app.MicroURL)
+	out, err := json.Marshal(inv)
+
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	app.InfoLog.Println(resp.Body)
+
+	return nil
 }
 
 // VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transactions

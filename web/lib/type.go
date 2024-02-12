@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/nayeemnishaat/go-web-app/api/model"
@@ -24,6 +25,7 @@ type Config struct {
 	Session       scs.SessionManager
 	SigningSecret string
 	FrontendURL   string
+	MicroURL      string
 }
 
 type Application struct {
@@ -46,4 +48,15 @@ type TransactionData struct {
 	ExpiryMonth     int
 	ExpiryYear      int
 	BankReturnCode  string
+}
+
+type Invoice struct {
+	ID        int       `json:"id"`
+	Quantity  int       `json:"quantity"`
+	Amount    int       `json:"amount"`
+	Product   string    `json:"product"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
 }

@@ -31,6 +31,7 @@ func main() {
 	flag.StringVar(&app.Env, "env", "dev", "App Env {dev|prod}")
 	flag.StringVar(&app.API, "api", "http://localhost:4000", "API URL")
 	flag.StringVar(&app.FrontendURL, "frontend_url", "http://localhost:3000", "Frontend Url")
+	flag.StringVar(&app.MicroURL, "micro_url", "http://localhost:5000", "Microservice Url")
 
 	flag.Parse()
 
