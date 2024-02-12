@@ -18,6 +18,7 @@ type config struct {
 		Username string
 		Password string
 		Port     int
+		From     string
 	}
 	FrontendURL string
 }
@@ -37,6 +38,7 @@ func main() {
 	flag.StringVar(&cfg.SMTP.Username, "smtp_username", "1d69f754aa40ea", "SMTP Username")
 	flag.StringVar(&cfg.SMTP.Password, "smtp_password", "31b59553edd95d", "SMTP Password")
 	flag.IntVar(&cfg.SMTP.Port, "smtp_port", 25, "SMTP Port")
+	flag.StringVar(&cfg.SMTP.From, "from_email", "info@widgets.com", "From Email")
 	flag.StringVar(&cfg.FrontendURL, "frontend_url", "http://localhost:3000", "Frontend Url")
 
 	flag.Parse()
