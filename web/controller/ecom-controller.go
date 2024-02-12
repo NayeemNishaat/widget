@@ -144,10 +144,11 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Todo: Can we call it as a go routine?
-	err = app.callInvoiceMicro(inv)
-	if err != nil {
-		app.ErrorLog.Println(err)
-	}
+	go app.callInvoiceMicro(inv)
+	// err = app.callInvoiceMicro(inv)
+	// if err != nil {
+	// 	app.ErrorLog.Println(err)
+	// }
 
 	app.Session.Put(r.Context(), "receipt", txnData)
 	http.Redirect(w, r, "/ecom/receipt", http.StatusSeeOther)
@@ -162,13 +163,14 @@ func (app *Application) callInvoiceMicro(inv webLib.Invoice) error {
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
+
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-
+	req.Close = true
 	resp, err := client.Do(req)
 
 	if err != nil {

@@ -31,17 +31,6 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// order := Order{
-	// 	ID:        1,
-	// 	Quantity:  3,
-	// 	Amount:    1000,
-	// 	Product:   "Widget",
-	// 	FirstName: "Nayeem",
-	// 	LastName:  "Nishaat",
-	// 	Email:     "nayeem@nishaats",
-	// 	CreatedAt: time.Now(),
-	// }
-
 	// generate a pdf invoice
 	err = app.createInvoicePDF(order)
 	if err != nil {
