@@ -73,7 +73,8 @@ func (app *application) SendMail(from, to, subject, tmpl string, attachments []s
 
 	if len(attachments) > 0 {
 		for i, x := range attachments {
-			email.Attach(&mail.File{FilePath: x, Name: fmt.Sprintf("invlice-%d.pdf", i+1), Inline: true})
+			email.AddAttachment(x, fmt.Sprintf("invlice-%d.pdf", i+1))
+			// email.Attach(&mail.File{FilePath: x, Name: fmt.Sprintf("invlice-%d.pdf", i+1), Inline: true})
 		}
 	}
 

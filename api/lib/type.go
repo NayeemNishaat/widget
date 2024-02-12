@@ -1,5 +1,7 @@
 package lib
 
+import "time"
+
 type StripePayload struct {
 	Currency      string `json:"currency"`
 	Amount        string `json:"amount"`
@@ -19,4 +21,17 @@ type Response struct {
 	Error   bool           `json:"error,omitempty"`
 	Message string         `json:"message,omitempty"`
 	Data    map[string]any `json:"data,omitempty"`
+}
+
+// Invoice describes the JSON payload sent to the microservice
+type Invoice struct {
+	ID        int       `json:"id"`
+	WidgetID  int       `json:"widget_id"`
+	Amount    int       `json:"amount"`
+	Product   string    `json:"product"`
+	Quantity  int       `json:"quantity"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
 }

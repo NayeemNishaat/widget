@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -177,11 +178,28 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		// Create Order
 		order := model.Order{WidgetID: productID, TransactionID: txnID, CustomerID: customerID, StatusID: 4, Quantity: 1, Amount: amount, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 
-		_, err = app.SaveOrder(order)
+		orderID, err := app.SaveOrder(order)
 		if err != nil {
 			app.ErrorLog.Println(err)
 			return
 		}
+
+		inv := lib.Invoice{
+			ID:        orderID,
+			Amount:    2000,
+			Product:   "Bronze Plan monthly subscription",
+			Quantity:  order.Quantity,
+			FirstName: data.FirstName,
+			LastName:  data.LastName,
+			Email:     data.Email,
+			CreatedAt: time.Now(),
+		}
+
+		go app.callInvoiceMicro(inv)
+		// err = app.callInvoiceMicro(inv)
+		// if err != nil {
+		// 	app.ErrorLog.Println(err)
+		// }
 	}
 
 	out, err := json.MarshalIndent(map[string]any{"OK": okay, "Message": txnMsg}, "", "  ")
@@ -193,6 +211,30 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
+}
+
+// callInvoiceMicro calls the invoicing microservice
+func (app *application) callInvoiceMicro(inv lib.Invoice) error {
+	url := "http://localhost:5000/invoice/create-and-send"
+	out, err := json.MarshalIndent(inv, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 func (app *application) createAuthToken(w http.ResponseWriter, r *http.Request) {
