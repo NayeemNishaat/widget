@@ -143,7 +143,6 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		CreatedAt: time.Now(),
 	}
 
-	// Todo: Can we call it as a go routine?
 	go app.callInvoiceMicro(inv)
 	// err = app.callInvoiceMicro(inv)
 	// if err != nil {
@@ -305,3 +304,7 @@ func (app *Application) BronzePlan(w http.ResponseWriter, r *http.Request) {
 		app.ErrorLog.Println(err)
 	}
 }
+
+// Todo: Implement gracefull shutdown
+// Todo: Make sure all mailer go-routines are done before shutting down (use both channel and wait group)
+// Todo: Fix pdf content issue
