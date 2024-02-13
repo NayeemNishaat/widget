@@ -153,37 +153,43 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/ecom/receipt", http.StatusSeeOther)
 }
 
-func (app *Application) callInvoiceMicro(inv webLib.Invoice) error {
+func (app *Application) callInvoiceMicro(inv webLib.Invoice) {
 	url := fmt.Sprintf("%s/invoice/create-and-send", app.MicroURL)
 	out, err := json.Marshal(inv)
 
 	if err != nil {
-		return err
+		app.ErrorLog.Println(err)
+		return
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
 
 	if err != nil {
-		return err
+		app.ErrorLog.Println(err)
+		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
+	// client := &http.Client{}
+	var client = &http.Client{
+		Transport: &http.Transport{},
+	}
+
 	req.Close = true
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return err
+		app.ErrorLog.Println(err)
+		return
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		app.ErrorLog.Println(err)
+		return
 	}
 	app.InfoLog.Println(string(body))
-
-	return nil
 }
 
 // VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transactions

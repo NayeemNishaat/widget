@@ -62,13 +62,14 @@ func main() {
 }
 
 func (app *application) serve() error {
+	// Important: Socket hang up / EOF error will be thrown if below thresholds are exceeded
 	srv := http.Server{
 		Addr:              fmt.Sprintf(":%d", app.Port),
 		Handler:           app.Router(),
 		IdleTimeout:       30 * time.Second,
 		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
-		WriteTimeout:      5 * time.Second,
 	}
 
 	app.InfoLog.Printf("Invoice microservice running on port %d", app.Port)

@@ -61,7 +61,7 @@ func (app *application) SendMail(from, to, subject, tmpl string, attachments []s
 	if err != nil {
 		return err
 	}
-	defer smtpClient.Close()
+	// defer smtpClient.Close()
 
 	email := mail.NewMSG()
 	email.SetFrom(from).

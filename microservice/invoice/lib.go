@@ -44,9 +44,9 @@ func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Head
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(out)
+	_, err = w.Write(out)
 
-	return nil
+	return err
 }
 
 func BadRequest(w http.ResponseWriter, r *http.Request, err error) error {
