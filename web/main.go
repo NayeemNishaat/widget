@@ -74,7 +74,7 @@ func Serve(app *lib.Application) error {
 		IdleTimeout:       30 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
-		WriteTimeout:      5 * time.Second,
+		WriteTimeout:      10 * time.Second,
 	}
 
 	app.InfoLog.Printf("Starting server on %s mode on port %d\n", app.Env, app.Port)

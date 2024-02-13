@@ -46,8 +46,8 @@ start_invoice:
 	cd ./microservice/invoice && go run . &
 
 stop_invoice:
-# @-pkill -SIGTERM -fi "invoice"
-	@-lsof -ti:${INVOICE_PORT} | xargs -r kill
+	@-pkill -SIGTERM -fi "invoice"
+# @-lsof -ti:${INVOICE_PORT} | xargs -r kill
 	@echo "Stopped Invoice"
 # ps $34553 # get full process details
 # killall "process_name"

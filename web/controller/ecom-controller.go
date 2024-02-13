@@ -312,5 +312,4 @@ func (app *Application) BronzePlan(w http.ResponseWriter, r *http.Request) {
 }
 
 // Todo: Implement gracefull shutdown
-// Todo: Make sure all mailer go-routines are done before shutting down, use channel in the fe and wait group in the be for achieving this.
-// Todo: Fix pdf content issue
+// Todo: Make sure all mailer go-routines are done before shutting down, use channel in the fe for achieving this.

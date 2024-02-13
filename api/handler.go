@@ -195,6 +195,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			CreatedAt: time.Now(),
 		}
 
+		app.Wg.Add(1)
 		go app.callInvoiceMicro(inv)
 		// err = app.callInvoiceMicro(inv)
 		// if err != nil {
@@ -215,6 +216,8 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 // callInvoiceMicro calls the invoicing microservice
 func (app *application) callInvoiceMicro(inv lib.Invoice) error {
+	defer app.Wg.Done()
+
 	url := "http://localhost:5000/invoice/create-and-send"
 	out, err := json.MarshalIndent(inv, "", "\t")
 	if err != nil {

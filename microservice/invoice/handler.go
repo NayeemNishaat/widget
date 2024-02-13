@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/phpdave11/gofpdf"
@@ -39,23 +38,23 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	}
 
 	// create mail attachment
-	attachments := []string{
+	_ = []string{
 		fmt.Sprintf("./pdf/%d.pdf", order.ID),
 	}
 
 	// send mail with attachment
-	err = app.SendMail(app.SMTP.From, order.Email, "Your Invoice", "invoice", attachments, nil)
-	if err != nil {
-		BadRequest(w, r, err)
-		return
-	}
+	// err = app.SendMail(app.SMTP.From, order.Email, "Your Invoice", "invoice", attachments, nil)
+	// if err != nil {
+	// 	BadRequest(w, r, err)
+	// 	return
+	// }
 
-	// delete attachments
-	for _, attachment := range attachments {
-		if err := os.Remove(attachment); err != nil {
-			fmt.Println("Failed to remove file!", err)
-		}
-	}
+	// // delete attachments
+	// for _, attachment := range attachments {
+	// 	if err := os.Remove(attachment); err != nil {
+	// 		fmt.Println("Failed to remove file!", err)
+	// 	}
+	// }
 
 	// send response
 	var resp struct {
@@ -105,6 +104,12 @@ func (app *application) createInvoicePDF(order Order) error {
 
 	pdf.SetX(185)
 	pdf.CellFormat(20, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100)), "", 0, "R", false, 0, "")
+
+	pdf.SetY(240)
+	pdf.CellFormat(195, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100)), "", 0, "R", false, 0, "")
+
+	pdf.SetY(249)
+	pdf.CellFormat(195, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100)), "", 0, "R", false, 0, "")
 
 	invoicePath := fmt.Sprintf("./pdf/%d.pdf", order.ID)
 	err := pdf.OutputFileAndClose(invoicePath)

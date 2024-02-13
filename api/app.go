@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/nayeemnishaat/go-web-app/api/model"
 )
@@ -19,6 +20,7 @@ type config struct {
 		Key    string
 	}
 	DB   *model.SqlDB
+	Wg   *sync.WaitGroup
 	SMTP struct {
 		Host     string
 		Username string
