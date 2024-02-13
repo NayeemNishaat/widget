@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/phpdave11/gofpdf"
@@ -38,23 +39,23 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	}
 
 	// create mail attachment
-	_ = []string{
+	attachments := []string{
 		fmt.Sprintf("./pdf/%d.pdf", order.ID),
 	}
 
 	// send mail with attachment
-	// err = app.SendMail(app.SMTP.From, order.Email, "Your Invoice", "invoice", attachments, nil)
-	// if err != nil {
-	// 	BadRequest(w, r, err)
-	// 	return
-	// }
+	err = app.SendMail(app.SMTP.From, order.Email, "Your Invoice", "invoice", attachments, nil)
+	if err != nil {
+		BadRequest(w, r, err)
+		return
+	}
 
-	// // delete attachments
-	// for _, attachment := range attachments {
-	// 	if err := os.Remove(attachment); err != nil {
-	// 		fmt.Println("Failed to remove file!", err)
-	// 	}
-	// }
+	// delete attachments
+	for _, attachment := range attachments {
+		if err := os.Remove(attachment); err != nil {
+			fmt.Println("Failed to remove file!", err)
+		}
+	}
 
 	// send response
 	var resp struct {
