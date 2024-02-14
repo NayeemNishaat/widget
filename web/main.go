@@ -107,8 +107,6 @@ func gracefulShutdown() {
 func shutdown() {
 	fmt.Println("\nPerforming Cleanup")
 
-	// cleanup websocket
-
 	wg.Wait()
 	close(wsPayload)
 	close(quitChan)

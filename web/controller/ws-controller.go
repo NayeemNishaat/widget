@@ -23,6 +23,7 @@ var upgradeConnection = websocket.Upgrader{
 
 var clients = make(map[*websocket.Conn]string)
 var clientsMutex sync.Mutex
+var payload lib.WsPayload
 
 // var wsChan = make(chan WsPayload)
 
@@ -82,9 +83,16 @@ func (app *Application) ListenForWS(conn *websocket.Conn) {
 		}
 	}()
 
-	var payload lib.WsPayload
-
 	for {
+		select {
+		case _, ok := <-app.WsChan:
+			if !ok {
+				fmt.Println("ListenForWS go routine closed!")
+				return
+			}
+		default:
+		}
+
 		err := conn.ReadJSON(&payload)
 
 		// fmt.Println(err, payload, clients)
