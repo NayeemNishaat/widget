@@ -143,6 +143,7 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		CreatedAt: time.Now(),
 	}
 
+	app.Wg.Add(1)
 	go app.callInvoiceMicro(inv)
 	// err = app.callInvoiceMicro(inv)
 	// if err != nil {
@@ -154,6 +155,8 @@ func (app *Application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 }
 
 func (app *Application) callInvoiceMicro(inv webLib.Invoice) {
+	defer app.Wg.Done()
+
 	url := fmt.Sprintf("%s/invoice/create-and-send", app.MicroURL)
 	out, err := json.Marshal(inv)
 

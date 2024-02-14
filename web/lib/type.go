@@ -4,9 +4,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/gorilla/websocket"
 	"github.com/nayeemnishaat/go-web-app/api/model"
 )
 
@@ -34,6 +36,8 @@ type Application struct {
 	ErrorLog      *log.Logger
 	TemplateCache map[string]*template.Template
 	Version       string
+	WsChan        chan WsPayload
+	Wg            *sync.WaitGroup
 }
 
 type TransactionData struct {
@@ -59,4 +63,13 @@ type Invoice struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type WsPayload struct {
+	Action      string          `json:"action"`
+	Message     string          `json:"message"`
+	Username    string          `json:"username"`
+	MessageType string          `json:"message_type"`
+	UsedID      int             `json:"user_id"`
+	Conn        *websocket.Conn `json:"-"`
 }

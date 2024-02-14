@@ -8,6 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/alexedwards/scs/pgxstore"
@@ -22,6 +25,9 @@ import (
 const VERSION = "1.0.0"
 const CSS_VERSION = "1"
 const SESSION_LIFETIME = 24 * time.Hour
+
+var wsPayload = make(chan lib.WsPayload)
+var wg sync.WaitGroup
 
 func main() {
 	gob.Register(lib.TransactionData{}) // Important: Registering session variable type.
@@ -44,6 +50,8 @@ func main() {
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	app.TemplateCache = make(map[string]*template.Template)
 	app.Version = VERSION
+	app.WsChan = wsPayload
+	app.Wg = &wg
 
 	db := lib.InitDB()
 	defer db.Close()
@@ -82,5 +90,26 @@ func Serve(app *lib.Application) error {
 		fmt.Printf("http://localhost:%d\n", app.Port)
 	}
 
+	go gracefulShutdown()
 	return srv.ListenAndServe()
+}
+
+var quitChan = make(chan os.Signal, 1)
+
+func gracefulShutdown() {
+	signal.Notify(quitChan, syscall.SIGINT, syscall.SIGTERM)
+	<-quitChan
+
+	shutdown()
+	os.Exit(0)
+}
+
+func shutdown() {
+	fmt.Println("\nPerforming Cleanup")
+
+	// cleanup websocket
+
+	wg.Wait()
+	close(wsPayload)
+	close(quitChan)
 }
