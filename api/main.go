@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	// "github.com/nayeemnishaat/go-web-app/api/lib"
-	// "github.com/nayeemnishaat/go-web-app/api/model"
+	"github.com/nayeemnishaat/go-web-app/api/lib"
+	"github.com/nayeemnishaat/go-web-app/api/model"
 )
 
 var wg sync.WaitGroup
@@ -25,9 +25,9 @@ func main() {
 	}
 
 	initApp()
-	// db := lib.InitDB()
-	// defer db.Close()
-	// app.DB = &model.SqlDB{Pool: db}
+	db := lib.InitDB()
+	defer db.Close()
+	app.DB = &model.SqlDB{Pool: db}
 	app.Wg = &wg
 
 	err = serve(&app)
