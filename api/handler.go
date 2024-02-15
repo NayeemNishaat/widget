@@ -83,7 +83,7 @@ func (app *application) getWidgetByID(w http.ResponseWriter, r *http.Request) {
 }
 
 // SaveCustomer saves a customer and returns id
-func (app *application) SaveCustomer(firstName, lastName, email string) (int, error) {
+func (app *application) saveCustomer(firstName, lastName, email string) (int, error) {
 	customer := model.Customer{
 		FirstName: firstName,
 		LastName:  lastName,
@@ -98,7 +98,7 @@ func (app *application) SaveCustomer(firstName, lastName, email string) (int, er
 }
 
 // SaveTransaction saves a txn and returns id
-func (app *application) SaveTxn(txn model.Transactions) (int, error) {
+func (app *application) saveTxn(txn model.Transactions) (int, error) {
 	id, err := app.DB.InsertTransaction(txn)
 	if err != nil {
 		return 0, err
@@ -107,7 +107,7 @@ func (app *application) SaveTxn(txn model.Transactions) (int, error) {
 }
 
 // SaveOrder saves a order and returns id
-func (app *application) SaveOrder(order model.Order) (int, error) {
+func (app *application) saveOrder(order model.Order) (int, error) {
 	id, err := app.DB.InsertOrder(order)
 	if err != nil {
 		return 0, err
@@ -121,6 +121,16 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	if err != nil {
 		app.ErrorLog.Println(err)
+		return
+	}
+
+	// validate data
+	v := lib.NewValidator()
+	v.Check(len(data.FirstName) > 1, "first_name", "must be at least 2 characters")
+	v.Check(data.LastName != "", "last_name", "cannot be empty")
+
+	if !v.Valid() {
+		app.fieldValidation(w, r, v.Errors)
 		return
 	}
 
@@ -148,7 +158,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	if okay {
 		productID, _ := strconv.Atoi(data.ProductID)
-		customerID, err := app.SaveCustomer(data.FirstName, data.LastName, data.Email)
+		customerID, err := app.saveCustomer(data.FirstName, data.LastName, data.Email)
 		if err != nil {
 			app.ErrorLog.Println(err)
 			return
@@ -169,7 +179,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			PaymentMethod:       data.PaymentMethod,
 		}
 
-		txnID, err := app.SaveTxn(txn)
+		txnID, err := app.saveTxn(txn)
 		if err != nil {
 			app.ErrorLog.Println(err)
 			return
@@ -178,7 +188,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		// Create Order
 		order := model.Order{WidgetID: productID, TransactionID: txnID, CustomerID: customerID, StatusID: 4, Quantity: 1, Amount: amount, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 
-		orderID, err := app.SaveOrder(order)
+		orderID, err := app.saveOrder(order)
 		if err != nil {
 			app.ErrorLog.Println(err)
 			return
@@ -203,7 +213,7 @@ func (app *application) createCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		// }
 	}
 
-	out, err := json.MarshalIndent(map[string]any{"OK": okay, "Message": txnMsg}, "", "  ")
+	out, err := json.MarshalIndent(map[string]any{"error": !okay, "message": txnMsg}, "", "  ")
 
 	if err != nil {
 		app.ErrorLog.Println(err)
@@ -344,7 +354,7 @@ func (app *application) checkAuthentication(w http.ResponseWriter, r *http.Reque
 	lib.WriteJSON(w, http.StatusOK, payload)
 }
 
-func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+func (app *application) virtualTerminalPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
 	var txnData struct {
 		PaymentAmount   int    `json:"amount"`
 		PaymentCurrency string `json:"currency"`
@@ -398,7 +408,7 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 		TransactionStatusID: 7,
 	}
 
-	_, err = app.SaveTxn(txn)
+	_, err = app.saveTxn(txn)
 	if err != nil {
 		lib.BadRequest(w, r, err)
 		return
@@ -507,7 +517,7 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }
 
-func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
+func (app *application) allSales(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		PageSize    int `json:"page_size"`
 		CurrentPage int `json:"page"`
@@ -543,7 +553,7 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 }
 
 // AllSubscriptions returns all subscriptions as a slice
-func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
+func (app *application) allSubscriptions(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		PageSize    int `json:"page_size"`
 		CurrentPage int `json:"page"`
@@ -578,7 +588,7 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 	lib.WriteJSON(w, http.StatusOK, resp)
 }
 
-func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
+func (app *application) getSale(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	orderID, _ := strconv.Atoi(id)
 
@@ -591,7 +601,7 @@ func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
 	lib.WriteJSON(w, http.StatusOK, order)
 }
 
-func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
+func (app *application) refundCharge(w http.ResponseWriter, r *http.Request) {
 	var chargeToRefund struct {
 		ID            int    `json:"id"`
 		PaymentIntent string `json:"pi"`
@@ -637,7 +647,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 	lib.WriteJSON(w, http.StatusCreated, resp)
 }
 
-func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Request) {
+func (app *application) cancelSubscription(w http.ResponseWriter, r *http.Request) {
 	var subToCancel struct {
 		ID            int    `json:"id"`
 		PaymentIntent string `json:"pi"`
@@ -681,7 +691,7 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 }
 
 // AllUsers returns a JSON file listing all admin users
-func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+func (app *application) allUsers(w http.ResponseWriter, r *http.Request) {
 	allUsers, err := app.DB.GetAllUsers()
 	if err != nil {
 		lib.BadRequest(w, r, err)
@@ -692,7 +702,7 @@ func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 // OneUser gets one user by id (from the url) and returns it as JSON
-func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) oneUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, _ := strconv.Atoi(id)
 
@@ -706,7 +716,7 @@ func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // EditUser is the handler for adding or editing an existing user
-func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) editUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, _ := strconv.Atoi(id)
 
@@ -761,7 +771,7 @@ func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteUser deletes a user, and all associated tokens, from the database
-func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, _ := strconv.Atoi(id)
 
@@ -778,4 +788,17 @@ func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	resp.Error = false
 	lib.WriteJSON(w, http.StatusOK, resp)
+}
+
+func (app *application) fieldValidation(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	var payload struct {
+		Error   bool              `json:"error"`
+		Message string            `json:"message"`
+		Errors  map[string]string `json:"errors"`
+	}
+
+	payload.Error = true
+	payload.Message = "failed validation"
+	payload.Errors = errors
+	lib.WriteJSON(w, http.StatusUnprocessableEntity, payload)
 }

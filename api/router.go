@@ -30,19 +30,19 @@ func Router() http.Handler {
 	mux.Route("/api/v1/admin", func(r chi.Router) {
 		r.Use(app.Auth)
 
-		r.Post("/virtual-terminal-succeeded", app.VirtualTerminalPaymentSucceeded)
+		r.Post("/virtual-terminal-succeeded", app.virtualTerminalPaymentSucceeded)
 
-		r.Post("/all-sales", app.AllSales)
-		r.Post("/all-subscriptions", app.AllSubscriptions)
-		r.Post("/get-sale/{id}", app.GetSale)
+		r.Post("/all-sales", app.allSales)
+		r.Post("/all-subscriptions", app.allSubscriptions)
+		r.Post("/get-sale/{id}", app.getSale)
 
-		r.Post("/refund", app.RefundCharge)
-		r.Post("/cancel-subscription", app.CancelSubscription)
+		r.Post("/refund", app.refundCharge)
+		r.Post("/cancel-subscription", app.cancelSubscription)
 
-		r.Post("/all-users", app.AllUsers)
-		r.Post("/all-users/{id}", app.OneUser)
-		r.Post("/all-users/edit/{id}", app.EditUser)
-		r.Post("/all-users/delete/{id}", app.DeleteUser)
+		r.Post("/all-users", app.allUsers)
+		r.Post("/all-users/{id}", app.oneUser)
+		r.Post("/all-users/edit/{id}", app.editUser)
+		r.Post("/all-users/delete/{id}", app.deleteUser)
 	})
 
 	return mux
